@@ -1,5 +1,8 @@
 import { logger } from "./Logger";
 import type { EventData, ViewBase } from "@nativescript/core";
+import { implementation as EventTargetImpl } from "jsdom/lib/jsdom/living/events/EventTarget-impl";
+import { mixin } from "jsdom/lib/jsdom/utils.js";
+// import { implementation as NodeImpl } from "jsdom/lib/jsdom/living/nodes/Node-impl.js";
 
 // From https://github.com/shirakaba/react-nativescript/blob/43403fc3d51efe557570bb5a06daced2b09fb408/react-nativescript/src/nativescript-vue-next/runtime/nodes.ts#L187-L227
 export class EventTarget_ implements EventTarget {
@@ -52,6 +55,7 @@ export class EventTarget_ implements EventTarget {
         return !event.cancelable || event.defaultPrevented;
     }
 }
+// mixin(EventTargetImpl.prototype, )
 
 class NodeList_ implements NodeList {
     [index: number]: Node;
