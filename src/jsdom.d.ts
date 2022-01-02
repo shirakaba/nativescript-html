@@ -43,6 +43,9 @@ declare module 'jsdom/lib/jsdom/living/nodes/Document-impl' {
 declare module 'jsdom/lib/jsdom/living/nodes/Node-impl' {
     export class implementation extends Node {}
 }
+declare module 'jsdom/lib/jsdom/living/nodes/NodeList-impl' {
+    export class implementation extends NodeList {}
+}
 declare module 'jsdom/lib/jsdom/living/nodes/Element-impl' {
     export class implementation extends Element {}
 }

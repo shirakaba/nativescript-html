@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "@nativescript/core": "^8.1.5",
+    "@types/jsdom": "^16.2.14",
     "@typescript-eslint/eslint-plugin": "^5.8.1",
     "@typescript-eslint/parser": "^5.8.1",
     "eslint": "^8.6.0",
