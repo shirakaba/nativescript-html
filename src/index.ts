@@ -53,6 +53,10 @@ export class EventTarget_ implements EventTarget {
     }
 }
 
+/**
+ * Warning: this implementation does not support indexing, e.g. nodeList[2].
+ * I'm not sure how to implement that; might need Proxy?
+ */
 class NodeList_ implements NodeList {
     [index: number]: Node;
     private array: Node[] = [];
@@ -161,4 +165,366 @@ export abstract class Node_ extends EventTarget_ implements Node {
     NOTATION_NODE = 12;
     PROCESSING_INSTRUCTION_NODE = 7;
     TEXT_NODE = 3;
+}
+
+class DOMException_ implements DOMException {
+    constructor(
+        readonly message: string = "",
+        readonly name: string = "Error",
+    ){}
+    get code(): number {
+        switch(this.name){
+            case "INDEX_SIZE_ERR": return this.INDEX_SIZE_ERR;
+            case "DOMSTRING_SIZE_ERR": return this.DOMSTRING_SIZE_ERR;
+            case "HIERARCHY_REQUEST_ERR": return this.HIERARCHY_REQUEST_ERR;
+            case "WRONG_DOCUMENT_ERR": return this.WRONG_DOCUMENT_ERR;
+            case "INVALID_CHARACTER_ERR": return this.INVALID_CHARACTER_ERR;
+            case "NO_DATA_ALLOWED_ERR": return this.NO_DATA_ALLOWED_ERR;
+            case "NO_MODIFICATION_ALLOWED_ERR": return this.NO_MODIFICATION_ALLOWED_ERR;
+            case "NOT_FOUND_ERR": return this.NOT_FOUND_ERR;
+            case "NOT_SUPPORTED_ERR": return this.NOT_SUPPORTED_ERR;
+            case "INUSE_ATTRIBUTE_ERR": return this.INUSE_ATTRIBUTE_ERR;
+            case "INVALID_STATE_ERR": return this.INVALID_STATE_ERR;
+            case "SYNTAX_ERR": return this.SYNTAX_ERR;
+            case "INVALID_MODIFICATION_ERR": return this.INVALID_MODIFICATION_ERR;
+            case "NAMESPACE_ERR": return this.NAMESPACE_ERR;
+            case "INVALID_ACCESS_ERR": return this.INVALID_ACCESS_ERR;
+            case "VALIDATION_ERR": return this.VALIDATION_ERR;
+            case "TYPE_MISMATCH_ERR": return this.TYPE_MISMATCH_ERR;
+            case "SECURITY_ERR": return this.SECURITY_ERR;
+            case "NETWORK_ERR": return this.NETWORK_ERR;
+            case "ABORT_ERR": return this.ABORT_ERR;
+            case "URL_MISMATCH_ERR": return this.URL_MISMATCH_ERR;
+            case "QUOTA_EXCEEDED_ERR": return this.QUOTA_EXCEEDED_ERR;
+            case "TIMEOUT_ERR": return this.TIMEOUT_ERR;
+            case "INVALID_NODE_TYPE_ERR": return this.INVALID_NODE_TYPE_ERR;
+            case "DATA_CLONE_ERR": return this.DATA_CLONE_ERR;
+            default: return 0;
+        }
+    }
+    INDEX_SIZE_ERR = 1;
+    DOMSTRING_SIZE_ERR = 2;
+    HIERARCHY_REQUEST_ERR = 3;
+    WRONG_DOCUMENT_ERR = 4;
+    INVALID_CHARACTER_ERR = 5;
+    NO_DATA_ALLOWED_ERR = 6;
+    NO_MODIFICATION_ALLOWED_ERR = 7;
+    NOT_FOUND_ERR = 8;
+    NOT_SUPPORTED_ERR = 9;
+    INUSE_ATTRIBUTE_ERR = 10;
+    INVALID_STATE_ERR = 11;
+    SYNTAX_ERR = 12;
+    INVALID_MODIFICATION_ERR = 13;
+    NAMESPACE_ERR = 14;
+    INVALID_ACCESS_ERR = 15;
+    VALIDATION_ERR = 16;
+    TYPE_MISMATCH_ERR = 17;
+    SECURITY_ERR = 18;
+    NETWORK_ERR = 19;
+    ABORT_ERR = 20;
+    URL_MISMATCH_ERR = 21;
+    QUOTA_EXCEEDED_ERR = 22;
+    TIMEOUT_ERR = 23;
+    INVALID_NODE_TYPE_ERR = 24;
+    DATA_CLONE_ERR = 25;
+    stack?: string | undefined;
+}
+
+/**
+ * I'm a bit unclear on how prefixes and namespaces work, so try to avoid namespaces altogether.
+ */
+class NamedNodeMap_ implements NamedNodeMap {
+    [index: number]: Attr;
+    map: Map<string, Attr> = new Map();
+    get length(): number {
+        return Object.keys(this.map).length;
+    }
+    getNamedItem(qualifiedName: string): Attr | null {
+        return this.map.get(qualifiedName) || null;
+    }
+    getNamedItemNS(namespace: string | null, localName: string): Attr | null {
+        const qualifiedName = `${namespace ? `${namespace}:` : ""}${localName}`;
+        return this.getNamedItem(qualifiedName);
+    }
+    item(index: number): Attr | null {
+        return this.map.get(Object.keys(this.map)[index]) || null;
+    }
+    removeNamedItem(qualifiedName: string): Attr {
+        const attr = this.map.get(qualifiedName);
+        if(!attr){
+            throw new DOMException_("", "NOT_FOUND_ERR");
+        }
+        this.map.delete(qualifiedName);
+        return attr;
+    }
+    removeNamedItemNS(namespace: string | null, localName: string): Attr {
+        const qualifiedName = `${namespace ? `${namespace}:` : ""}${localName}`;
+        const attr = this.map.get(qualifiedName);
+        if(!attr){
+            throw new DOMException_("", "NOT_FOUND_ERR");
+        }
+        this.map.delete(qualifiedName);
+        return attr;
+    }
+    setNamedItem(attr: Attr): Attr | null {
+        const {
+            localName,
+            namespaceURI: namespace = null,
+            prefix = null,
+        } = attr;
+        const prefixedNamespace = (prefix && namespace) ? `${prefix}:` : "";
+        const qualifiedName = `${prefixedNamespace}${localName}`;
+        let existingAttr = this.getNamedItem(qualifiedName);
+        if(existingAttr === null){
+            existingAttr = attr;
+        }
+        this.map.set(qualifiedName, attr);
+        return existingAttr;
+    }
+    setNamedItemNS(attr: Attr): Attr | null {
+        return this.setNamedItem(attr);
+    }
+    [Symbol.iterator](): IterableIterator<Attr> {
+        return this.map[Symbol.iterator]();
+    }
+}
+
+/**
+ * Warning: this implementation does not support indexing, e.g. nodeList[2].
+ * I'm not sure how to implement that; might need Proxy?
+ */
+export abstract class Element_ extends Node_ implements Element {
+    attributes: NamedNodeMap;
+    classList: DOMTokenList;
+    className: string;
+    clientHeight: number;
+    clientLeft: number;
+    clientTop: number;
+    clientWidth: number;
+    id: string;
+    localName: string;
+    namespaceURI: string | null;
+    onfullscreenchange: ((this: Element, ev: Event) => any) | null;
+    onfullscreenerror: ((this: Element, ev: Event) => any) | null;
+    outerHTML: string;
+    part: DOMTokenList;
+    prefix: string | null;
+    scrollHeight: number;
+    scrollLeft: number;
+    scrollTop: number;
+    scrollWidth: number;
+    shadowRoot: ShadowRoot | null;
+    slot: string;
+    tagName: string;
+    attachShadow(init: ShadowRootInit): ShadowRoot {
+        throw new Error("Method not implemented.");
+    }
+    closest<K extends keyof HTMLElementTagNameMap>(selector: K): HTMLElementTagNameMap[K] | null;
+    closest<K extends keyof SVGElementTagNameMap>(selector: K): SVGElementTagNameMap[K] | null;
+    closest<E extends Element = Element>(selectors: string): E | null;
+    closest(selectors: any): E | HTMLElementTagNameMap[K] | SVGElementTagNameMap[K] | null {
+        throw new Error("Method not implemented.");
+    }
+    getAttribute(qualifiedName: string): string | null {
+        throw new Error("Method not implemented.");
+    }
+    getAttributeNS(namespace: string | null, localName: string): string | null {
+        throw new Error("Method not implemented.");
+    }
+    getAttributeNames(): string[] {
+        throw new Error("Method not implemented.");
+    }
+    getAttributeNode(qualifiedName: string): Attr | null {
+        throw new Error("Method not implemented.");
+    }
+    getAttributeNodeNS(namespace: string | null, localName: string): Attr | null {
+        throw new Error("Method not implemented.");
+    }
+    getBoundingClientRect(): DOMRect {
+        throw new Error("Method not implemented.");
+    }
+    getClientRects(): DOMRectList {
+        throw new Error("Method not implemented.");
+    }
+    getElementsByClassName(classNames: string): HTMLCollectionOf<Element> {
+        throw new Error("Method not implemented.");
+    }
+    getElementsByTagName<K extends keyof HTMLElementTagNameMap>(qualifiedName: K): HTMLCollectionOf<HTMLElementTagNameMap[K]>;
+    getElementsByTagName<K extends keyof SVGElementTagNameMap>(qualifiedName: K): HTMLCollectionOf<SVGElementTagNameMap[K]>;
+    getElementsByTagName(qualifiedName: string): HTMLCollectionOf<Element>;
+    getElementsByTagName(qualifiedName: any): HTMLCollectionOf<Element> | HTMLCollectionOf<HTMLElementTagNameMap[K]> | HTMLCollectionOf<SVGElementTagNameMap[K]> {
+        throw new Error("Method not implemented.");
+    }
+    getElementsByTagNameNS(namespaceURI: "http://www.w3.org/1999/xhtml", localName: string): HTMLCollectionOf<HTMLElement>;
+    getElementsByTagNameNS(namespaceURI: "http://www.w3.org/2000/svg", localName: string): HTMLCollectionOf<SVGElement>;
+    getElementsByTagNameNS(namespace: string | null, localName: string): HTMLCollectionOf<Element>;
+    getElementsByTagNameNS(namespace: any, localName: any): HTMLCollectionOf<Element> | HTMLCollectionOf<HTMLElement> | HTMLCollectionOf<SVGElement> {
+        throw new Error("Method not implemented.");
+    }
+    hasAttribute(qualifiedName: string): boolean {
+        throw new Error("Method not implemented.");
+    }
+    hasAttributeNS(namespace: string | null, localName: string): boolean {
+        throw new Error("Method not implemented.");
+    }
+    hasAttributes(): boolean {
+        throw new Error("Method not implemented.");
+    }
+    hasPointerCapture(pointerId: number): boolean {
+        throw new Error("Method not implemented.");
+    }
+    insertAdjacentElement(where: InsertPosition, element: Element): Element | null {
+        throw new Error("Method not implemented.");
+    }
+    insertAdjacentHTML(position: InsertPosition, text: string): void {
+        throw new Error("Method not implemented.");
+    }
+    insertAdjacentText(where: InsertPosition, data: string): void {
+        throw new Error("Method not implemented.");
+    }
+    matches(selectors: string): boolean {
+        throw new Error("Method not implemented.");
+    }
+    releasePointerCapture(pointerId: number): void {
+        throw new Error("Method not implemented.");
+    }
+    removeAttribute(qualifiedName: string): void {
+        throw new Error("Method not implemented.");
+    }
+    removeAttributeNS(namespace: string | null, localName: string): void {
+        throw new Error("Method not implemented.");
+    }
+    removeAttributeNode(attr: Attr): Attr {
+        throw new Error("Method not implemented.");
+    }
+    requestFullscreen(options?: FullscreenOptions): Promise<void> {
+        throw new Error("Method not implemented.");
+    }
+    requestPointerLock(): void {
+        throw new Error("Method not implemented.");
+    }
+    scroll(options?: ScrollToOptions): void;
+    scroll(x: number, y: number): void;
+    scroll(x?: any, y?: any): void {
+        throw new Error("Method not implemented.");
+    }
+    scrollBy(options?: ScrollToOptions): void;
+    scrollBy(x: number, y: number): void;
+    scrollBy(x?: any, y?: any): void {
+        throw new Error("Method not implemented.");
+    }
+    scrollIntoView(arg?: boolean | ScrollIntoViewOptions): void {
+        throw new Error("Method not implemented.");
+    }
+    scrollTo(options?: ScrollToOptions): void;
+    scrollTo(x: number, y: number): void;
+    scrollTo(x?: any, y?: any): void {
+        throw new Error("Method not implemented.");
+    }
+    setAttribute(qualifiedName: string, value: string): void {
+        throw new Error("Method not implemented.");
+    }
+    setAttributeNS(namespace: string | null, qualifiedName: string, value: string): void {
+        throw new Error("Method not implemented.");
+    }
+    setAttributeNode(attr: Attr): Attr | null {
+        throw new Error("Method not implemented.");
+    }
+    setAttributeNodeNS(attr: Attr): Attr | null {
+        throw new Error("Method not implemented.");
+    }
+    setPointerCapture(pointerId: number): void {
+        throw new Error("Method not implemented.");
+    }
+    toggleAttribute(qualifiedName: string, force?: boolean): boolean {
+        throw new Error("Method not implemented.");
+    }
+    webkitMatchesSelector(selectors: string): boolean {
+        throw new Error("Method not implemented.");
+    }
+    // NativeScript Core does not implement ARIA, and the typings don't accept null, so we'll go with empty-string.
+    ariaAtomic = "";
+    ariaAutoComplete = "";
+    ariaBusy = "";
+    ariaChecked = "";
+    ariaColCount = "";
+    ariaColIndex = "";
+    ariaColSpan = "";
+    ariaCurrent = "";
+    ariaDisabled = "";
+    ariaExpanded = "";
+    ariaHasPopup = "";
+    ariaHidden = "";
+    ariaKeyShortcuts = "";
+    ariaLabel = "";
+    ariaLevel = "";
+    ariaLive = "";
+    ariaModal = "";
+    ariaMultiLine = "";
+    ariaMultiSelectable = "";
+    ariaOrientation = "";
+    ariaPlaceholder = "";
+    ariaPosInSet = "";
+    ariaPressed = "";
+    ariaReadOnly = "";
+    ariaRequired = "";
+    ariaRoleDescription = "";
+    ariaRowCount = "";
+    ariaRowIndex = "";
+    ariaRowSpan = "";
+    ariaSelected = "";
+    ariaSetSize = "";
+    ariaSort = "";
+    ariaValueMax = "";
+    ariaValueMin = "";
+    ariaValueNow = "";
+    ariaValueText = "";
+    animate(keyframes: Keyframe[] | PropertyIndexedKeyframes | null, options?: number | KeyframeAnimationOptions): Animation {
+        throw new Error("Method not implemented.");
+    }
+    getAnimations(options?: GetAnimationsOptions): Animation[] {
+        throw new Error("Method not implemented.");
+    }
+    after(...nodes: (string | Node)[]): void {
+        throw new Error("Method not implemented.");
+    }
+    before(...nodes: (string | Node)[]): void {
+        throw new Error("Method not implemented.");
+    }
+    remove(): void {
+        throw new Error("Method not implemented.");
+    }
+    replaceWith(...nodes: (string | Node)[]): void {
+        throw new Error("Method not implemented.");
+    }
+    innerHTML: string;
+    nextElementSibling: Element | null;
+    previousElementSibling: Element | null;
+    childElementCount: number;
+    children: HTMLCollection;
+    firstElementChild: Element | null;
+    lastElementChild: Element | null;
+    append(...nodes: (string | Node)[]): void {
+        throw new Error("Method not implemented.");
+    }
+    prepend(...nodes: (string | Node)[]): void {
+        throw new Error("Method not implemented.");
+    }
+    querySelector<K extends keyof HTMLElementTagNameMap>(selectors: K): HTMLElementTagNameMap[K] | null;
+    querySelector<K extends keyof SVGElementTagNameMap>(selectors: K): SVGElementTagNameMap[K] | null;
+    querySelector<E extends Element = Element>(selectors: string): E | null;
+    querySelector(selectors: any): E | HTMLElementTagNameMap[K] | SVGElementTagNameMap[K] | null {
+        throw new Error("Method not implemented.");
+    }
+    querySelectorAll<K extends keyof HTMLElementTagNameMap>(selectors: K): NodeListOf<HTMLElementTagNameMap[K]>;
+    querySelectorAll<K extends keyof SVGElementTagNameMap>(selectors: K): NodeListOf<SVGElementTagNameMap[K]>;
+    querySelectorAll<E extends Element = Element>(selectors: string): NodeListOf<E>;
+    querySelectorAll(selectors: any): NodeListOf<HTMLElementTagNameMap[K]> | NodeListOf<SVGElementTagNameMap[K]> | NodeListOf<E> {
+        throw new Error("Method not implemented.");
+    }
+    replaceChildren(...nodes: (string | Node)[]): void {
+        throw new Error("Method not implemented.");
+    }
+    assignedSlot: HTMLSlotElement | null;
+
 }
