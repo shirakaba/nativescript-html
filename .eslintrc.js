@@ -5,9 +5,19 @@ module.exports = {
     },
     parser: '@typescript-eslint/parser',
     parserOptions: {
+      // sourceType: "module",
       tsconfigRootDir: __dirname,
       project: ['./tsconfig.json'],
     },
+    // overrides: [
+    //   {
+    //     files: ['*.ts', '*.tsx'], // Your TypeScript files extension
+    //     parserOptions: {
+    //       project: ['./tsconfig.json'], // Specify it only for TypeScript files
+    //     },
+    //   },
+    // ],
+    ignorePatterns: ["example/**/*", ".eslintrc.js"],
     plugins: [
       '@typescript-eslint',
     ],
