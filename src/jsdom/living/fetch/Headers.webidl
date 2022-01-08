@@ -1,0 +1,14 @@
+// https://fetch.spec.whatwg.org/#headers-class
+typedef (sequence<sequence<ByteString>> or record<ByteString, ByteString>) HeadersInit;
+
+[Exposed=(Window,Worker)]
+interface Headers {
+  constructor(optional HeadersInit init);
+
+  undefined append(ByteString name, ByteString value);
+  undefined delete(ByteString name);
+  ByteString? get(ByteString name);
+  boolean has(ByteString name);
+  undefined set(ByteString name, ByteString value);
+  iterable<ByteString, ByteString>;
+};
