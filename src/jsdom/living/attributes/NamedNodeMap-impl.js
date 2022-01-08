@@ -1,9 +1,11 @@
 "use strict";
 
 const DOMException = require("domexception/webidl2js-wrapper");
-const idlUtils = require("../generated/utils.js");
 const attributes = require("../attributes.js");
 const { HTML_NS } = require("../helpers/namespaces");
+
+const supportedPropertyIndices = Symbol("supported property indices");
+const supportsPropertyName = Symbol("supports property name");
 
 exports.implementation = class NamedNodeMapImpl {
   constructor(globalObject, args, privateData) {
@@ -15,7 +17,7 @@ exports.implementation = class NamedNodeMapImpl {
     return this._element._attributeList;
   }
 
-  get [idlUtils.supportedPropertyIndices]() {
+  get [supportedPropertyIndices]() {
     return this._attributeList.keys();
   }
   get length() {
@@ -28,7 +30,7 @@ exports.implementation = class NamedNodeMapImpl {
     return this._attributeList[index];
   }
 
-  get [idlUtils.supportedPropertyNames]() {
+  get [supportedPropertyNames]() {
     const names = new Set(this._attributeList.map(a => a._qualifiedName));
     const el = this._element;
     if (el._namespaceURI === HTML_NS && el._ownerDocument._parsingMode === "html") {

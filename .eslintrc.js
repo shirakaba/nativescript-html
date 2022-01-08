@@ -17,7 +17,7 @@ module.exports = {
     //     },
     //   },
     // ],
-    ignorePatterns: ["example/**/*", ".eslintrc.js"],
+    ignorePatterns: ["example/**/*", ".eslintrc.js", "src/jsdom/**/*"],
     plugins: [
       '@typescript-eslint',
     ],
