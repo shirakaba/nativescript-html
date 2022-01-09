@@ -1,6 +1,6 @@
 "use strict";
 
-const { CookieJar } = require("tough-cookie");
+// const { CookieJar } = require("tough-cookie");
 
 const NodeImpl = require("./Node-impl").implementation;
 const idlUtils = require("../generated/utils");
@@ -8,7 +8,7 @@ const NODE_TYPE = require("../node-type");
 const { hasWeakRefs, mixin, memoizeQuery } = require("../../utils");
 const { firstChildWithLocalName, firstChildWithLocalNames, firstDescendantWithLocalName } =
   require("../helpers/traversal");
-const whatwgURL = require("whatwg-url");
+// const whatwgURL = require("whatwg-url");
 const StyleSheetList = require("../generated/StyleSheetList.js");
 const { domSymbolTree } = require("../helpers/internal-constants");
 const eventAccessors = require("../helpers/create-event-accessor");
@@ -17,8 +17,8 @@ const { childTextContent } = require("../helpers/text");
 const { HTML_NS, SVG_NS } = require("../helpers/namespaces");
 const DOMException = require("domexception/webidl2js-wrapper");
 const { parseIntoDocument } = require("../../browser/parser");
-const History = require("../generated/History");
-const Location = require("../generated/Location");
+// const History = require("../generated/History");
+// const Location = require("../generated/Location");
 const HTMLCollection = require("../generated/HTMLCollection");
 const NodeList = require("../generated/NodeList");
 const validateName = require("../helpers/validate-names").name;
@@ -52,20 +52,22 @@ const documents = require("../documents.js");
 const CustomEvent = require("../generated/CustomEvent");
 const ErrorEvent = require("../generated/ErrorEvent");
 const Event = require("../generated/Event");
-const FocusEvent = require("../generated/FocusEvent");
-const HashChangeEvent = require("../generated/HashChangeEvent");
-const KeyboardEvent = require("../generated/KeyboardEvent");
-const MessageEvent = require("../generated/MessageEvent");
-const MouseEvent = require("../generated/MouseEvent");
-const PopStateEvent = require("../generated/PopStateEvent");
-const ProgressEvent = require("../generated/ProgressEvent");
-const TouchEvent = require("../generated/TouchEvent");
-const UIEvent = require("../generated/UIEvent");
+// NOT IMPLEMENTED
+// const FocusEvent = require("../generated/FocusEvent");
+// const HashChangeEvent = require("../generated/HashChangeEvent");
+// const KeyboardEvent = require("../generated/KeyboardEvent");
+// const MessageEvent = require("../generated/MessageEvent");
+// const MouseEvent = require("../generated/MouseEvent");
+// const PopStateEvent = require("../generated/PopStateEvent");
+// const ProgressEvent = require("../generated/ProgressEvent");
+// const TouchEvent = require("../generated/TouchEvent");
+// const UIEvent = require("../generated/UIEvent");
 
 const RequestManager = require("../../browser/resources/request-manager");
 const AsyncResourceQueue = require("../../browser/resources/async-resource-queue");
 const ResourceQueue = require("../../browser/resources/resource-queue");
 const PerDocumentResourceLoader = require("../../browser/resources/per-document-resource-loader");
+const notImplemented = require("../../browser/not-implemented");
 
 function clearChildNodes(node) {
   for (let child = domSymbolTree.firstChild(node); child; child = domSymbolTree.firstChild(node)) {
@@ -94,19 +96,20 @@ const eventInterfaceTable = {
   errorevent: ErrorEvent,
   event: Event,
   events: Event,
-  focusevent: FocusEvent,
-  hashchangeevent: HashChangeEvent,
-  htmlevents: Event,
-  keyboardevent: KeyboardEvent,
-  messageevent: MessageEvent,
-  mouseevent: MouseEvent,
-  mouseevents: MouseEvent,
-  popstateevent: PopStateEvent,
-  progressevent: ProgressEvent,
-  svgevents: Event,
-  touchevent: TouchEvent,
-  uievent: UIEvent,
-  uievents: UIEvent
+  // NOT IMPLEMENTED
+  // focusevent: FocusEvent,
+  // hashchangeevent: HashChangeEvent,
+  // htmlevents: Event,
+  // keyboardevent: KeyboardEvent,
+  // messageevent: MessageEvent,
+  // mouseevent: MouseEvent,
+  // mouseevents: MouseEvent,
+  // popstateevent: PopStateEvent,
+  // progressevent: ProgressEvent,
+  // svgevents: Event,
+  // touchevent: TouchEvent,
+  // uievent: UIEvent,
+  // uievents: UIEvent
 };
 
 class DocumentImpl extends NodeImpl {
@@ -142,12 +145,14 @@ class DocumentImpl extends NodeImpl {
     this._attached = true;
     this._currentScript = null;
     this._pageShowingFlag = false;
-    this._cookieJar = privateData.options.cookieJar;
+    // NOT IMPLEMENTED
+    // this._cookieJar = privateData.options.cookieJar;
     this._parseOptions = privateData.options.parseOptions || {};
     this._scriptingDisabled = privateData.options.scriptingDisabled;
-    if (this._cookieJar === undefined) {
-      this._cookieJar = new CookieJar(null, { looseMode: true });
-    }
+    // NOT IMPLEMENTED
+    // if (this._cookieJar === undefined) {
+    //   this._cookieJar = new CookieJar(null, { looseMode: true });
+    // }
 
     if (this._scriptingDisabled) {
       this._parseOptions.scriptingEnabled = false;
@@ -156,23 +161,27 @@ class DocumentImpl extends NodeImpl {
     this.contentType = privateData.options.contentType;
     this._encoding = privateData.options.encoding;
 
-    const urlOption = privateData.options.url === undefined ? "about:blank" : privateData.options.url;
-    const parsed = whatwgURL.parseURL(urlOption);
-    if (parsed === null) {
-      throw new TypeError(`Could not parse "${urlOption}" as a URL`);
-    }
+    // NOT IMPLEMENTED
+    // const urlOption = privateData.options.url === undefined ? "about:blank" : privateData.options.url;
+    // const parsed = whatwgURL.parseURL(urlOption);
+    // if (parsed === null) {
+    //   throw new TypeError(`Could not parse "${urlOption}" as a URL`);
+    // }
 
-    this._URL = parsed;
-    this._origin = urlOption === "about:blank" && privateData.options.parentOrigin ?
-      privateData.options.parentOrigin :
-      whatwgURL.serializeURLOrigin(this._URL);
+    // NOT IMPLEMENTED
+    // this._URL = parsed;
+    // this._origin = urlOption === "about:blank" && privateData.options.parentOrigin ?
+    //   privateData.options.parentOrigin :
+    //   whatwgURL.serializeURLOrigin(this._URL);
+    this._origin = "null";
 
-    this._location = Location.createImpl(this._globalObject, [], { relevantDocument: this });
-    this._history = History.createImpl(this._globalObject, [], {
-      window: this._defaultView,
-      document: this,
-      actAsIfLocationReloadCalled: () => this._location.reload()
-    });
+    // NOT IMPLEMENTED
+    // this._location = Location.createImpl(this._globalObject, [], { relevantDocument: this });
+    // this._history = History.createImpl(this._globalObject, [], {
+    //   window: this._defaultView,
+    //   document: this,
+    //   actAsIfLocationReloadCalled: () => this._location.reload()
+    // });
 
     if (hasWeakRefs) {
       this._workingNodeIterators = new IterableWeakSet();
@@ -230,13 +239,22 @@ class DocumentImpl extends NodeImpl {
     return null;
   }
   get URL() {
-    return whatwgURL.serializeURL(this._URL);
+    // NOT IMPLEMENTED
+    notImplemented("window.URL", this._defaultView);
+    return "about:blank";
+    // return whatwgURL.serializeURL(this._URL);
   }
   get documentURI() {
-    return whatwgURL.serializeURL(this._URL);
+    // NOT IMPLEMENTED
+    notImplemented("window.documentURI", this._defaultView);
+    return "about:blank";
+    // return whatwgURL.serializeURL(this._URL);
   }
   get location() {
-    return this._defaultView ? this._location : null;
+    // NOT IMPLEMENTED
+    notImplemented("window.location", this._defaultView);
+    return null;
+    // return this._defaultView ? this._location : null;
   }
 
   // https://dom.spec.whatwg.org/#dom-document-documentelement
@@ -857,14 +875,24 @@ class DocumentImpl extends NodeImpl {
   }
 
   get cookie() {
-    return this._cookieJar.getCookieStringSync(this.URL, { http: false });
+    // NOT IMPLEMENTED
+    const nameForErrorMessage = "window.cookie";
+    notImplemented("window.cookie", this._defaultView);
+    throw new Error(`Not implemented: ${nameForErrorMessage}`);
+
+    // return this._cookieJar.getCookieStringSync(this.URL, { http: false });
   }
   set cookie(cookieStr) {
-    cookieStr = String(cookieStr);
-    this._cookieJar.setCookieSync(cookieStr, this.URL, {
-      http: false,
-      ignoreError: true
-    });
+    // NOT IMPLEMENTED
+    const nameForErrorMessage = "window.cookie";
+    notImplemented("window.cookie", this._defaultView);
+    throw new Error(`Not implemented: ${nameForErrorMessage}`);
+    
+    // cookieStr = String(cookieStr);
+    // this._cookieJar.setCookieSync(cookieStr, this.URL, {
+    //   http: false,
+    //   ignoreError: true
+    // });
   }
 
   // The clear(), captureEvents(), and releaseEvents() methods must do nothing
@@ -902,6 +930,7 @@ class DocumentImpl extends NodeImpl {
 
   // https://w3c.github.io/selection-api/#extensions-to-document-interface
   getSelection() {
+    notImplemented("document.getSelection", this._defaultView);
     return this._defaultView ? this._defaultView._selection : null;
   }
 
@@ -917,8 +946,9 @@ class DocumentImpl extends NodeImpl {
       }
     );
 
-    copy._URL = this._URL;
-    copy._origin = this._origin;
+    // NOT IMPLEMENTED
+    // copy._URL = this._URL;
+    // copy._origin = this._origin;
     return copy;
   }
 }

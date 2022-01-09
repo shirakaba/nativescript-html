@@ -1,8 +1,8 @@
 "use strict";
-const vm = require("vm");
+// const vm = require("vm");
 const webIDLConversions = require("webidl-conversions");
 const { CSSStyleDeclaration } = require("cssstyle");
-const { Performance: RawPerformance } = require("w3c-hr-time");
+// const { Performance: RawPerformance } = require("w3c-hr-time");
 const notImplemented = require("./not-implemented");
 const { installInterfaces } = require("../living/interfaces");
 const { define, mixin } = require("../utils");
@@ -18,19 +18,19 @@ const postMessage = require("../living/post-message");
 const DOMException = require("domexception/webidl2js-wrapper");
 const { btoa, atob } = require("abab");
 const idlUtils = require("../living/generated/utils");
-const WebSocketImpl = require("../living/websockets/WebSocket-impl").implementation;
+// const WebSocketImpl = require("../living/websockets/WebSocket-impl").implementation;
 const BarProp = require("../living/generated/BarProp");
 const documents = require("../living/documents.js");
 const External = require("../living/generated/External");
-const Navigator = require("../living/generated/Navigator");
-const Performance = require("../living/generated/Performance");
-const Screen = require("../living/generated/Screen");
-const Storage = require("../living/generated/Storage");
-const Selection = require("../living/generated/Selection");
+// const Navigator = require("../living/generated/Navigator");
+// const Performance = require("../living/generated/Performance");
+// const Screen = require("../living/generated/Screen");
+// const Storage = require("../living/generated/Storage");
+// const Selection = require("../living/generated/Selection");
 const reportException = require("../living/helpers/runtime-script-errors");
 const { getCurrentEventHandlerValue } = require("../living/helpers/create-event-accessor.js");
 const { fireAnEvent } = require("../living/helpers/events");
-const SessionHistory = require("../living/window/SessionHistory");
+// const SessionHistory = require("../living/window/SessionHistory");
 const { forEachMatchingSheetRuleOfElement, getResolvedValue, propertiesWithResolvedValueImplemented,
   SHADOW_DOM_PSEUDO_REGEXP } = require("../living/helpers/style-rules.js");
 const CustomElementRegistry = require("../living/generated/CustomElementRegistry");
@@ -220,8 +220,8 @@ function setupWindow(windowInstance, { runScripts }) {
 function Window(options) {
   setupWindow(this, { runScripts: options.runScripts });
 
-  const rawPerformance = new RawPerformance();
-  const windowInitialized = rawPerformance.now();
+  // const rawPerformance = new RawPerformance();
+  // const windowInitialized = rawPerformance.now();
 
   const window = this;
 
@@ -248,20 +248,22 @@ function Window(options) {
     parentOrigin: options.parentOrigin
   }, { alwaysUseDocumentClass: true });
 
-  if (vm.isContext(window)) {
-    const documentImpl = idlUtils.implForWrapper(window._document);
-    documentImpl._defaultView = window._globalProxy = vm.runInContext("this", window);
-  }
+  // NOT IMPLEMENTED
+  // if (vm.isContext(window)) {
+  //   const documentImpl = idlUtils.implForWrapper(window._document);
+  //   documentImpl._defaultView = window._globalProxy = vm.runInContext("this", window);
+  // }
 
   const documentOrigin = idlUtils.implForWrapper(this._document)._origin;
   this._origin = documentOrigin;
 
+  // NOT IMPLEMENTED
   // https://html.spec.whatwg.org/#session-history
-  this._sessionHistory = new SessionHistory({
-    document: idlUtils.implForWrapper(this._document),
-    url: idlUtils.implForWrapper(this._document)._URL,
-    stateObject: null
-  }, this);
+  // this._sessionHistory = new SessionHistory({
+  //   document: idlUtils.implForWrapper(this._document),
+  //   url: idlUtils.implForWrapper(this._document)._URL,
+  //   stateObject: null
+  // }, this);
 
   this._virtualConsole = options.virtualConsole;
 
@@ -301,31 +303,31 @@ function Window(options) {
   this._currentOriginData = this._commonForOrigin[documentOrigin];
 
   // ### WEB STORAGE
-
-  this._localStorage = Storage.create(window, [], {
-    associatedWindow: this,
-    storageArea: this._currentOriginData.localStorageArea,
-    type: "localStorage",
-    url: this._document.documentURI,
-    storageQuota: this._storageQuota
-  });
-  this._sessionStorage = Storage.create(window, [], {
-    associatedWindow: this,
-    storageArea: this._currentOriginData.sessionStorageArea,
-    type: "sessionStorage",
-    url: this._document.documentURI,
-    storageQuota: this._storageQuota
-  });
+  // NOT IMPLEMENTED
+  // this._localStorage = Storage.create(window, [], {
+  //   associatedWindow: this,
+  //   storageArea: this._currentOriginData.localStorageArea,
+  //   type: "localStorage",
+  //   url: this._document.documentURI,
+  //   storageQuota: this._storageQuota
+  // });
+  // this._sessionStorage = Storage.create(window, [], {
+  //   associatedWindow: this,
+  //   storageArea: this._currentOriginData.sessionStorageArea,
+  //   type: "sessionStorage",
+  //   url: this._document.documentURI,
+  //   storageQuota: this._storageQuota
+  // });
 
   // ### SELECTION
+  // NOT IMPLEMENTED
+  // // https://w3c.github.io/selection-api/#dfn-selection
+  // this._selection = Selection.createImpl(window);
 
-  // https://w3c.github.io/selection-api/#dfn-selection
-  this._selection = Selection.createImpl(window);
-
-  // https://w3c.github.io/selection-api/#dom-window
-  this.getSelection = function () {
-    return window._selection;
-  };
+  // // https://w3c.github.io/selection-api/#dom-window
+  // this.getSelection = function () {
+  //   return window._selection;
+  // };
 
   // ### GETTERS
 
@@ -336,9 +338,9 @@ function Window(options) {
   const statusbar = BarProp.create(window);
   const toolbar = BarProp.create(window);
   const external = External.create(window);
-  const navigator = Navigator.create(window, [], { userAgent: this._resourceLoader._userAgent });
-  const performance = Performance.create(window, [], { rawPerformance });
-  const screen = Screen.create(window);
+  // const navigator = Navigator.create(window, [], { userAgent: this._resourceLoader._userAgent });
+  // const performance = Performance.create(window, [], { rawPerformance });
+  // const screen = Screen.create(window);
   const customElementRegistry = CustomElementRegistry.create(window);
 
   define(this, {
@@ -376,7 +378,11 @@ function Window(options) {
       return idlUtils.wrapperForImpl(idlUtils.implForWrapper(window._document)._history);
     },
     get navigator() {
-      return navigator;
+      const nameForErrorMessage = "window.navigator";
+      notImplemented(nameForErrorMessage, this);
+      throw new Error(`Not implemented: ${nameForErrorMessage}`);
+
+      // return navigator;
     },
     get locationbar() {
       return locationbar;
@@ -400,7 +406,11 @@ function Window(options) {
       return performance;
     },
     get screen() {
-      return screen;
+      const nameForErrorMessage = "window.screen";
+      notImplemented(nameForErrorMessage, this);
+      throw new Error(`Not implemented: ${nameForErrorMessage}`);
+      
+      // return screen;
     },
     get origin() {
       return window._origin;
@@ -563,94 +573,100 @@ function Window(options) {
   let numberOfOngoingAnimationFrameCallbacks = 0;
 
   if (this._pretendToBeVisual) {
-    this.requestAnimationFrame = function (callback) {
-      callback = IDLFunction.convert(this, callback);
+    this.requestAnimationFrame = requestAnimationFrame;
+    this.cancelAnimationFrame = cancelAnimationFrame;
+    // this.requestAnimationFrame = function (callback) {
+    //   callback = IDLFunction.convert(this, callback);
 
-      const handle = ++animationFrameCallbackId;
-      mapOfAnimationFrameCallbacks.set(handle, callback);
+    //   const handle = ++animationFrameCallbackId;
+    //   mapOfAnimationFrameCallbacks.set(handle, callback);
 
-      ++numberOfOngoingAnimationFrameCallbacks;
-      if (numberOfOngoingAnimationFrameCallbacks === 1) {
-        animationFrameNodejsInterval = setInterval(() => {
-          runAnimationFrameCallbacks(rawPerformance.now() - windowInitialized);
-        }, 1000 / 60);
-      }
+    //   ++numberOfOngoingAnimationFrameCallbacks;
+    //   if (numberOfOngoingAnimationFrameCallbacks === 1) {
+    //     animationFrameNodejsInterval = setInterval(() => {
+    //       runAnimationFrameCallbacks(rawPerformance.now() - windowInitialized);
+    //     }, 1000 / 60);
+    //   }
 
-      return handle;
-    };
+    //   return handle;
+    // };
 
-    this.cancelAnimationFrame = function (handle) {
-      handle = webIDLConversions["unsigned long"](handle);
+    // this.cancelAnimationFrame = function (handle) {
+    //   handle = webIDLConversions["unsigned long"](handle);
 
-      removeAnimationFrameCallback(handle);
-    };
+    //   removeAnimationFrameCallback(handle);
+    // };
 
-    function runAnimationFrameCallbacks(now) {
-      // Converting to an array is important to get a sync snapshot and thus match spec semantics.
-      const callbackHandles = [...mapOfAnimationFrameCallbacks.keys()];
-      for (const handle of callbackHandles) {
-        // This has() can be false if a callback calls cancelAnimationFrame().
-        if (mapOfAnimationFrameCallbacks.has(handle)) {
-          const callback = mapOfAnimationFrameCallbacks.get(handle);
-          removeAnimationFrameCallback(handle);
-          try {
-            callback(now);
-          } catch (e) {
-            reportException(window, e, window.location.href);
-          }
-        }
-      }
-    }
+    // function runAnimationFrameCallbacks(now) {
+    //   // Converting to an array is important to get a sync snapshot and thus match spec semantics.
+    //   const callbackHandles = [...mapOfAnimationFrameCallbacks.keys()];
+    //   for (const handle of callbackHandles) {
+    //     // This has() can be false if a callback calls cancelAnimationFrame().
+    //     if (mapOfAnimationFrameCallbacks.has(handle)) {
+    //       const callback = mapOfAnimationFrameCallbacks.get(handle);
+    //       removeAnimationFrameCallback(handle);
+    //       try {
+    //         callback(now);
+    //       } catch (e) {
+    //         reportException(window, e, window.location.href);
+    //       }
+    //     }
+    //   }
+    // }
 
-    function removeAnimationFrameCallback(handle) {
-      if (mapOfAnimationFrameCallbacks.has(handle)) {
-        --numberOfOngoingAnimationFrameCallbacks;
-        if (numberOfOngoingAnimationFrameCallbacks === 0) {
-          clearInterval(animationFrameNodejsInterval);
-        }
-      }
+    // function removeAnimationFrameCallback(handle) {
+    //   if (mapOfAnimationFrameCallbacks.has(handle)) {
+    //     --numberOfOngoingAnimationFrameCallbacks;
+    //     if (numberOfOngoingAnimationFrameCallbacks === 0) {
+    //       clearInterval(animationFrameNodejsInterval);
+    //     }
+    //   }
 
-      mapOfAnimationFrameCallbacks.delete(handle);
-    }
+    //   mapOfAnimationFrameCallbacks.delete(handle);
+    // }
   }
 
-  function stopAllTimers() {
-    for (const nodejsTimer of listOfActiveTimers.values()) {
-      clearTimeout(nodejsTimer);
-    }
-    listOfActiveTimers.clear();
+  // function stopAllTimers() {
+  //   for (const nodejsTimer of listOfActiveTimers.values()) {
+  //     clearTimeout(nodejsTimer);
+  //   }
+  //   listOfActiveTimers.clear();
 
-    clearInterval(animationFrameNodejsInterval);
-  }
+  //   clearInterval(animationFrameNodejsInterval);
+  // }
 
   function Option(text, value, defaultSelected, selected) {
-    if (text === undefined) {
-      text = "";
-    }
-    text = webIDLConversions.DOMString(text);
+    const nameForErrorMessage = "window.Option";
+    notImplemented("window.Option", this);
+    throw new Error(`Not implemented: ${nameForErrorMessage}`);
 
-    if (value !== undefined) {
-      value = webIDLConversions.DOMString(value);
-    }
+    // if (text === undefined) {
+    //   text = "";
+    // }
+    // text = webIDLConversions.DOMString(text);
 
-    defaultSelected = webIDLConversions.boolean(defaultSelected);
-    selected = webIDLConversions.boolean(selected);
+    // if (value !== undefined) {
+    //   value = webIDLConversions.DOMString(value);
+    // }
 
-    const option = window._document.createElement("option");
-    const impl = idlUtils.implForWrapper(option);
+    // defaultSelected = webIDLConversions.boolean(defaultSelected);
+    // selected = webIDLConversions.boolean(selected);
 
-    if (text !== "") {
-      impl.text = text;
-    }
-    if (value !== undefined) {
-      impl.setAttributeNS(null, "value", value);
-    }
-    if (defaultSelected) {
-      impl.setAttributeNS(null, "selected", "");
-    }
-    impl._selectedness = selected;
+    // const option = window._document.createElement("option");
+    // const impl = idlUtils.implForWrapper(option);
 
-    return option;
+    // if (text !== "") {
+    //   impl.text = text;
+    // }
+    // if (value !== undefined) {
+    //   impl.setAttributeNS(null, "value", value);
+    // }
+    // if (defaultSelected) {
+    //   impl.setAttributeNS(null, "selected", "");
+    // }
+    // impl._selectedness = selected;
+
+    // return option;
   }
   Object.defineProperty(Option, "prototype", {
     value: this.HTMLOptionElement.prototype,
@@ -666,17 +682,21 @@ function Window(options) {
   });
 
   function Image(...args) {
-    const img = window._document.createElement("img");
-    const impl = idlUtils.implForWrapper(img);
+    const nameForErrorMessage = "window.Image";
+    notImplemented("window.Image", this);
+    throw new Error(`Not implemented: ${nameForErrorMessage}`);
 
-    if (args.length > 0) {
-      impl.setAttributeNS(null, "width", String(args[0]));
-    }
-    if (args.length > 1) {
-      impl.setAttributeNS(null, "height", String(args[1]));
-    }
+    // const img = window._document.createElement("img");
+    // const impl = idlUtils.implForWrapper(img);
 
-    return img;
+    // if (args.length > 0) {
+    //   impl.setAttributeNS(null, "width", String(args[0]));
+    // }
+    // if (args.length > 1) {
+    //   impl.setAttributeNS(null, "height", String(args[1]));
+    // }
+
+    // return img;
   }
   Object.defineProperty(Image, "prototype", {
     value: this.HTMLImageElement.prototype,
@@ -692,15 +712,19 @@ function Window(options) {
   });
 
   function Audio(src) {
-    const audio = window._document.createElement("audio");
-    const impl = idlUtils.implForWrapper(audio);
-    impl.setAttributeNS(null, "preload", "auto");
+    const nameForErrorMessage = "window.Audio";
+    notImplemented("window.Audio", this);
+    throw new Error(`Not implemented: ${nameForErrorMessage}`);
 
-    if (src !== undefined) {
-      impl.setAttributeNS(null, "src", String(src));
-    }
+    // const audio = window._document.createElement("audio");
+    // const impl = idlUtils.implForWrapper(audio);
+    // impl.setAttributeNS(null, "preload", "auto");
 
-    return audio;
+    // if (src !== undefined) {
+    //   impl.setAttributeNS(null, "src", String(src));
+    // }
+
+    // return audio;
   }
   Object.defineProperty(Audio, "prototype", {
     value: this.HTMLAudioElement.prototype,
@@ -740,41 +764,49 @@ function Window(options) {
   };
 
   this.stop = function () {
-    const manager = idlUtils.implForWrapper(this._document)._requestManager;
-    if (manager) {
-      manager.close();
-    }
+    const nameForErrorMessage = "window.stop";
+    notImplemented(nameForErrorMessage, this);
+    throw new Error(`Not implemented: ${nameForErrorMessage}`);
+
+    // const manager = idlUtils.implForWrapper(this._document)._requestManager;
+    // if (manager) {
+    //   manager.close();
+    // }
   };
 
   this.close = function () {
-    // Recursively close child frame windows, then ourselves (depth-first).
-    for (let i = 0; i < this.length; ++i) {
-      this[i].close();
-    }
+    const nameForErrorMessage = "window.close";
+    notImplemented(nameForErrorMessage, this);
+    throw new Error(`Not implemented: ${nameForErrorMessage}`);
 
-    // Clear out all listeners. Any in-flight or upcoming events should not get delivered.
-    idlUtils.implForWrapper(this)._eventListeners = Object.create(null);
+    // // Recursively close child frame windows, then ourselves (depth-first).
+    // for (let i = 0; i < this.length; ++i) {
+    //   this[i].close();
+    // }
 
-    if (this._document) {
-      if (this._document.body) {
-        this._document.body.innerHTML = "";
-      }
+    // // Clear out all listeners. Any in-flight or upcoming events should not get delivered.
+    // idlUtils.implForWrapper(this)._eventListeners = Object.create(null);
 
-      if (this._document.close) {
-        // It's especially important to clear out the listeners here because document.close() causes a "load" event to
-        // fire.
-        idlUtils.implForWrapper(this._document)._eventListeners = Object.create(null);
-        this._document.close();
-      }
-      const doc = idlUtils.implForWrapper(this._document);
-      if (doc._requestManager) {
-        doc._requestManager.close();
-      }
-      delete this._document;
-    }
+    // if (this._document) {
+    //   if (this._document.body) {
+    //     this._document.body.innerHTML = "";
+    //   }
 
-    stopAllTimers();
-    WebSocketImpl.cleanUpWindow(this);
+    //   if (this._document.close) {
+    //     // It's especially important to clear out the listeners here because document.close() causes a "load" event to
+    //     // fire.
+    //     idlUtils.implForWrapper(this._document)._eventListeners = Object.create(null);
+    //     this._document.close();
+    //   }
+    //   const doc = idlUtils.implForWrapper(this._document);
+    //   if (doc._requestManager) {
+    //     doc._requestManager.close();
+    //   }
+    //   delete this._document;
+    // }
+
+    // stopAllTimers();
+    // WebSocketImpl.cleanUpWindow(this);
   };
 
   this.getComputedStyle = function (elt, pseudoElt = undefined) {
