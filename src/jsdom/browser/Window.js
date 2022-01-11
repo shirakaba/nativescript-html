@@ -1,20 +1,20 @@
 "use strict";
 // const vm = require("vm");
-const webIDLConversions = require("webidl-conversions");
-const { CSSStyleDeclaration } = require("cssstyle");
+// const webIDLConversions = require("webidl-conversions");
+// const { CSSStyleDeclaration } = require("cssstyle");
 // const { Performance: RawPerformance } = require("w3c-hr-time");
 const notImplemented = require("./not-implemented");
 const { installInterfaces } = require("../living/interfaces");
 const { define, mixin } = require("../utils");
-const Element = require("../living/generated/Element");
+// const Element = require("../living/generated/Element");
 const EventTarget = require("../living/generated/EventTarget");
 const EventHandlerNonNull = require("../living/generated/EventHandlerNonNull");
-const IDLFunction = require("../living/generated/Function");
-const OnBeforeUnloadEventHandlerNonNull = require("../living/generated/OnBeforeUnloadEventHandlerNonNull");
-const OnErrorEventHandlerNonNull = require("../living/generated/OnErrorEventHandlerNonNull");
-const { fireAPageTransitionEvent } = require("../living/helpers/page-transition-event");
-const namedPropertiesWindow = require("../living/named-properties-window");
-const postMessage = require("../living/post-message");
+// const IDLFunction = require("../living/generated/Function");
+// const OnBeforeUnloadEventHandlerNonNull = require("../living/generated/OnBeforeUnloadEventHandlerNonNull");
+// const OnErrorEventHandlerNonNull = require("../living/generated/OnErrorEventHandlerNonNull");
+// const { fireAPageTransitionEvent } = require("../living/helpers/page-transition-event");
+// const namedPropertiesWindow = require("../living/named-properties-window");
+// const postMessage = require("../living/post-message");
 const DOMException = require("domexception/webidl2js-wrapper");
 const { btoa, atob } = require("abab");
 const idlUtils = require("../living/generated/utils");
@@ -27,12 +27,12 @@ const External = require("../living/generated/External");
 // const Screen = require("../living/generated/Screen");
 // const Storage = require("../living/generated/Storage");
 // const Selection = require("../living/generated/Selection");
-const reportException = require("../living/helpers/runtime-script-errors");
+// const reportException = require("../living/helpers/runtime-script-errors");
 const { getCurrentEventHandlerValue } = require("../living/helpers/create-event-accessor.js");
-const { fireAnEvent } = require("../living/helpers/events");
+// const { fireAnEvent } = require("../living/helpers/events");
 // const SessionHistory = require("../living/window/SessionHistory");
-const { forEachMatchingSheetRuleOfElement, getResolvedValue, propertiesWithResolvedValueImplemented,
-  SHADOW_DOM_PSEUDO_REGEXP } = require("../living/helpers/style-rules.js");
+// const { forEachMatchingSheetRuleOfElement, getResolvedValue, propertiesWithResolvedValueImplemented,
+//   SHADOW_DOM_PSEUDO_REGEXP } = require("../living/helpers/style-rules.js");
 const CustomElementRegistry = require("../living/generated/CustomElementRegistry");
 const jsGlobals = require("./js-globals.json");
 
@@ -40,54 +40,54 @@ const GlobalEventHandlersImpl = require("../living/nodes/GlobalEventHandlers-imp
 const WindowEventHandlersImpl = require("../living/nodes/WindowEventHandlers-impl").implementation;
 
 const events = new Set([
-  // GlobalEventHandlers
-  "abort", "autocomplete",
-  "autocompleteerror", "blur",
-  "cancel", "canplay", "canplaythrough",
-  "change", "click",
-  "close", "contextmenu",
-  "cuechange", "dblclick",
-  "drag", "dragend",
-  "dragenter",
-  "dragleave", "dragover",
-  "dragstart", "drop",
-  "durationchange", "emptied",
-  "ended", "focus",
-  "input", "invalid",
-  "keydown", "keypress",
-  "keyup", "load", "loadeddata",
-  "loadedmetadata", "loadstart",
-  "mousedown", "mouseenter",
-  "mouseleave", "mousemove",
-  "mouseout", "mouseover",
-  "mouseup", "wheel",
-  "pause", "play",
-  "playing", "progress",
-  "ratechange", "reset",
-  "resize", "scroll",
-  "securitypolicyviolation",
-  "seeked", "seeking",
-  "select", "sort", "stalled",
-  "submit", "suspend",
-  "timeupdate", "toggle",
-  "volumechange", "waiting",
+  // // GlobalEventHandlers
+  // "abort", "autocomplete",
+  // "autocompleteerror", "blur",
+  // "cancel", "canplay", "canplaythrough",
+  // "change", "click",
+  // "close", "contextmenu",
+  // "cuechange", "dblclick",
+  // "drag", "dragend",
+  // "dragenter",
+  // "dragleave", "dragover",
+  // "dragstart", "drop",
+  // "durationchange", "emptied",
+  // "ended", "focus",
+  // "input", "invalid",
+  // "keydown", "keypress",
+  // "keyup", "load", "loadeddata",
+  // "loadedmetadata", "loadstart",
+  // "mousedown", "mouseenter",
+  // "mouseleave", "mousemove",
+  // "mouseout", "mouseover",
+  // "mouseup", "wheel",
+  // "pause", "play",
+  // "playing", "progress",
+  // "ratechange", "reset",
+  // "resize", "scroll",
+  // "securitypolicyviolation",
+  // "seeked", "seeking",
+  // "select", "sort", "stalled",
+  // "submit", "suspend",
+  // "timeupdate", "toggle",
+  // "volumechange", "waiting",
 
-  // WindowEventHandlers
-  "afterprint",
-  "beforeprint",
-  "hashchange",
-  "languagechange",
-  "message",
-  "messageerror",
-  "offline",
-  "online",
-  "pagehide",
-  "pageshow",
-  "popstate",
-  "rejectionhandled",
-  "storage",
-  "unhandledrejection",
-  "unload"
+  // // WindowEventHandlers
+  // "afterprint",
+  // "beforeprint",
+  // "hashchange",
+  // "languagechange",
+  // "message",
+  // "messageerror",
+  // "offline",
+  // "online",
+  // "pagehide",
+  // "pageshow",
+  // "popstate",
+  // "rejectionhandled",
+  // "storage",
+  // "unhandledrejection",
+  // "unload"
 
   // "error" and "beforeunload" are added separately
 ]);
@@ -155,41 +155,42 @@ function setupWindow(windowInstance, { runScripts }) {
   mixin(windowInstance, GlobalEventHandlersImpl.prototype);
   windowInstance._initGlobalEvents();
 
-  Object.defineProperty(windowInstance, "onbeforeunload", {
-    configurable: true,
-    enumerable: true,
-    get() {
-      return idlUtils.tryWrapperForImpl(getCurrentEventHandlerValue(this, "beforeunload"));
-    },
-    set(V) {
-      if (!idlUtils.isObject(V)) {
-        V = null;
-      } else {
-        V = OnBeforeUnloadEventHandlerNonNull.convert(windowInstance, V, {
-          context: "Failed to set the 'onbeforeunload' property on 'Window': The provided value"
-        });
-      }
-      this._setEventHandlerFor("beforeunload", V);
-    }
-  });
+  // NOT IMPLEMENTED
+  // Object.defineProperty(windowInstance, "onbeforeunload", {
+  //   configurable: true,
+  //   enumerable: true,
+  //   get() {
+  //     return idlUtils.tryWrapperForImpl(getCurrentEventHandlerValue(this, "beforeunload"));
+  //   },
+  //   set(V) {
+  //     if (!idlUtils.isObject(V)) {
+  //       V = null;
+  //     } else {
+  //       V = OnBeforeUnloadEventHandlerNonNull.convert(windowInstance, V, {
+  //         context: "Failed to set the 'onbeforeunload' property on 'Window': The provided value"
+  //       });
+  //     }
+  //     this._setEventHandlerFor("beforeunload", V);
+  //   }
+  // });
 
-  Object.defineProperty(windowInstance, "onerror", {
-    configurable: true,
-    enumerable: true,
-    get() {
-      return idlUtils.tryWrapperForImpl(getCurrentEventHandlerValue(this, "error"));
-    },
-    set(V) {
-      if (!idlUtils.isObject(V)) {
-        V = null;
-      } else {
-        V = OnErrorEventHandlerNonNull.convert(windowInstance, V, {
-          context: "Failed to set the 'onerror' property on 'Window': The provided value"
-        });
-      }
-      this._setEventHandlerFor("error", V);
-    }
-  });
+  // Object.defineProperty(windowInstance, "onerror", {
+  //   configurable: true,
+  //   enumerable: true,
+  //   get() {
+  //     return idlUtils.tryWrapperForImpl(getCurrentEventHandlerValue(this, "error"));
+  //   },
+  //   set(V) {
+  //     if (!idlUtils.isObject(V)) {
+  //       V = null;
+  //     } else {
+  //       V = OnErrorEventHandlerNonNull.convert(windowInstance, V, {
+  //         context: "Failed to set the 'onerror' property on 'Window': The provided value"
+  //       });
+  //     }
+  //     this._setEventHandlerFor("error", V);
+  //   }
+  // });
 
   for (const event of events) {
     Object.defineProperty(windowInstance, `on${event}`, {
@@ -455,7 +456,8 @@ function Window(options) {
     }
   });
 
-  namedPropertiesWindow.initializeWindow(this, this._globalProxy);
+  // NOT IMPLEMENTED
+  // namedPropertiesWindow.initializeWindow(this, this._globalProxy);
 
   // ### METHODS
 
@@ -463,114 +465,124 @@ function Window(options) {
 
   // In the spec the list of active timers is a set of IDs. We make it a map of IDs to Node.js timer objects, so that
   // we can call Node.js-side clearTimeout() when clearing, and thus allow process shutdown faster.
-  const listOfActiveTimers = new Map();
-  let latestTimerId = 0;
+  // const listOfActiveTimers = new Map();
+  // let latestTimerId = 0;
 
-  this.setTimeout = function (handler, timeout = 0, ...args) {
-    if (typeof handler !== "function") {
-      handler = webIDLConversions.DOMString(handler);
-    }
-    timeout = webIDLConversions.long(timeout);
+  // NOT IMPLEMENTED
+  // this.setTimeout = function (handler, timeout = 0, ...args) {
+  //   if (typeof handler !== "function") {
+  //     handler = webIDLConversions.DOMString(handler);
+  //   }
+  //   timeout = webIDLConversions.long(timeout);
 
-    return timerInitializationSteps(handler, timeout, args, { methodContext: window, repeat: false });
-  };
-  this.setInterval = function (handler, timeout = 0, ...args) {
-    if (typeof handler !== "function") {
-      handler = webIDLConversions.DOMString(handler);
-    }
-    timeout = webIDLConversions.long(timeout);
+  //   return timerInitializationSteps(handler, timeout, args, { methodContext: window, repeat: false });
+  // };
+  // this.setInterval = function (handler, timeout = 0, ...args) {
+  //   if (typeof handler !== "function") {
+  //     handler = webIDLConversions.DOMString(handler);
+  //   }
+  //   timeout = webIDLConversions.long(timeout);
 
-    return timerInitializationSteps(handler, timeout, args, { methodContext: window, repeat: true });
-  };
+  //   return timerInitializationSteps(handler, timeout, args, { methodContext: window, repeat: true });
+  // };
 
-  this.clearTimeout = function (handle = 0) {
-    handle = webIDLConversions.long(handle);
+  // this.clearTimeout = function (handle = 0) {
+  //   handle = webIDLConversions.long(handle);
 
-    const nodejsTimer = listOfActiveTimers.get(handle);
-    if (nodejsTimer) {
-      clearTimeout(nodejsTimer);
-      listOfActiveTimers.delete(handle);
-    }
-  };
-  this.clearInterval = function (handle = 0) {
-    handle = webIDLConversions.long(handle);
+  //   const nodejsTimer = listOfActiveTimers.get(handle);
+  //   if (nodejsTimer) {
+  //     clearTimeout(nodejsTimer);
+  //     listOfActiveTimers.delete(handle);
+  //   }
+  // };
+  // this.clearInterval = function (handle = 0) {
+  //   handle = webIDLConversions.long(handle);
 
-    const nodejsTimer = listOfActiveTimers.get(handle);
-    if (nodejsTimer) {
-      // We use setTimeout() in timerInitializationSteps even for this.setInterval().
-      clearTimeout(nodejsTimer);
-      listOfActiveTimers.delete(handle);
-    }
-  };
+  //   const nodejsTimer = listOfActiveTimers.get(handle);
+  //   if (nodejsTimer) {
+  //     // We use setTimeout() in timerInitializationSteps even for this.setInterval().
+  //     clearTimeout(nodejsTimer);
+  //     listOfActiveTimers.delete(handle);
+  //   }
+  // };
 
-  function timerInitializationSteps(handler, timeout, args, { methodContext, repeat, previousHandle }) {
-    // This appears to be unspecced, but matches browser behavior for close()ed windows.
-    if (!methodContext._document) {
-      return 0;
-    }
+  // function timerInitializationSteps(handler, timeout, args, { methodContext, repeat, previousHandle }) {
+  //   // This appears to be unspecced, but matches browser behavior for close()ed windows.
+  //   if (!methodContext._document) {
+  //     return 0;
+  //   }
 
-    // TODO: implement timer nesting level behavior.
+  //   // TODO: implement timer nesting level behavior.
 
-    const methodContextProxy = methodContext._globalProxy;
-    const handle = previousHandle !== undefined ? previousHandle : ++latestTimerId;
+  //   const methodContextProxy = methodContext._globalProxy;
+  //   const handle = previousHandle !== undefined ? previousHandle : ++latestTimerId;
 
-    function task() {
-      if (!listOfActiveTimers.has(handle)) {
-        return;
-      }
+  //   function task() {
+  //     if (!listOfActiveTimers.has(handle)) {
+  //       return;
+  //     }
 
-      try {
-        if (typeof handler === "function") {
-          handler.apply(methodContextProxy, args);
-        } else if (window._runScripts === "dangerously") {
-          vm.runInContext(handler, window, { filename: window.location.href, displayErrors: false });
-        }
-      } catch (e) {
-        reportException(window, e, window.location.href);
-      }
+  //     try {
+  //       if (typeof handler === "function") {
+  //         handler.apply(methodContextProxy, args);
+  //       } else if (window._runScripts === "dangerously") {
+  //         vm.runInContext(handler, window, { filename: window.location.href, displayErrors: false });
+  //       }
+  //     } catch (e) {
+  //       reportException(window, e, window.location.href);
+  //     }
 
-      if (listOfActiveTimers.has(handle)) {
-        if (repeat) {
-          timerInitializationSteps(handler, timeout, args, { methodContext, repeat: true, previousHandle: handle });
-        } else {
-          listOfActiveTimers.delete(handle);
-        }
-      }
-    }
+  //     if (listOfActiveTimers.has(handle)) {
+  //       if (repeat) {
+  //         timerInitializationSteps(handler, timeout, args, { methodContext, repeat: true, previousHandle: handle });
+  //       } else {
+  //         listOfActiveTimers.delete(handle);
+  //       }
+  //     }
+  //   }
 
-    if (timeout < 0) {
-      timeout = 0;
-    }
+  //   if (timeout < 0) {
+  //     timeout = 0;
+  //   }
 
-    const nodejsTimer = setTimeout(task, timeout);
-    listOfActiveTimers.set(handle, nodejsTimer);
+  //   const nodejsTimer = setTimeout(task, timeout);
+  //   listOfActiveTimers.set(handle, nodejsTimer);
 
-    return handle;
-  }
+  //   return handle;
+  // }
+
+  this.setTimeout = setTimeout;
+  this.setInterval = setInterval;
+  this.clearTimeout = clearTimeout;
+  this.clearInterval = clearInterval;
 
   // https://html.spec.whatwg.org/multipage/timers-and-user-prompts.html#microtask-queuing
 
   this.queueMicrotask = function (callback) {
-    callback = IDLFunction.convert(this, callback);
+    const nameForErrorMessage = "window.queueMicrotask";
+    notImplemented("window.queueMicrotask", this._defaultView);
+    throw new Error(`Not implemented: ${nameForErrorMessage}`);
 
-    queueMicrotask(() => {
-      try {
-        callback();
-      } catch (e) {
-        reportException(window, e, window.location.href);
-      }
-    });
+    // callback = IDLFunction.convert(this, callback);
+
+    // queueMicrotask(() => {
+    //   try {
+    //     callback();
+    //   } catch (e) {
+    //     reportException(window, e, window.location.href);
+    //   }
+    // });
   };
 
   // https://html.spec.whatwg.org/multipage/imagebitmap-and-animations.html#animation-frames
 
-  let animationFrameCallbackId = 0;
-  const mapOfAnimationFrameCallbacks = new Map();
-  let animationFrameNodejsInterval = null;
+  // let animationFrameCallbackId = 0;
+  // const mapOfAnimationFrameCallbacks = new Map();
+  // let animationFrameNodejsInterval = null;
 
-  // Unlike the spec, where an animation frame happens every 60 Hz regardless, we optimize so that if there are no
-  // requestAnimationFrame() calls outstanding, we don't fire the timer. This helps us track that.
-  let numberOfOngoingAnimationFrameCallbacks = 0;
+  // // Unlike the spec, where an animation frame happens every 60 Hz regardless, we optimize so that if there are no
+  // // requestAnimationFrame() calls outstanding, we don't fire the timer. This helps us track that.
+  // let numberOfOngoingAnimationFrameCallbacks = 0;
 
   if (this._pretendToBeVisual) {
     this.requestAnimationFrame = requestAnimationFrame;
@@ -739,7 +751,7 @@ function Window(options) {
     writable: true
   });
 
-  this.postMessage = postMessage(window);
+  // this.postMessage = postMessage(window);
 
   this.atob = function (str) {
     const result = atob(str);
@@ -810,46 +822,50 @@ function Window(options) {
   };
 
   this.getComputedStyle = function (elt, pseudoElt = undefined) {
-    elt = Element.convert(this, elt);
-    if (pseudoElt !== undefined && pseudoElt !== null) {
-      pseudoElt = webIDLConversions.DOMString(pseudoElt);
-    }
+    const nameForErrorMessage = "window.computedStyle(elt)";
+    notImplemented(nameForErrorMessage, this);
+    throw new Error(`Not implemented: ${nameForErrorMessage}`);
 
-    if (pseudoElt !== undefined && pseudoElt !== null && pseudoElt !== "") {
-      // TODO: Parse pseudoElt
+    // elt = Element.convert(this, elt);
+    // if (pseudoElt !== undefined && pseudoElt !== null) {
+    //   pseudoElt = webIDLConversions.DOMString(pseudoElt);
+    // }
 
-      if (SHADOW_DOM_PSEUDO_REGEXP.test(pseudoElt)) {
-        throw new TypeError("Tried to get the computed style of a Shadow DOM pseudo-element.");
-      }
+    // if (pseudoElt !== undefined && pseudoElt !== null && pseudoElt !== "") {
+    //   // TODO: Parse pseudoElt
 
-      notImplemented("window.computedStyle(elt, pseudoElt)", this);
-    }
+    //   if (SHADOW_DOM_PSEUDO_REGEXP.test(pseudoElt)) {
+    //     throw new TypeError("Tried to get the computed style of a Shadow DOM pseudo-element.");
+    //   }
 
-    const declaration = new CSSStyleDeclaration();
-    const { forEach } = Array.prototype;
-    const { style } = elt;
+    //   notImplemented("window.computedStyle(elt, pseudoElt)", this);
+    // }
 
-    forEachMatchingSheetRuleOfElement(elt, rule => {
-      forEach.call(rule.style, property => {
-        declaration.setProperty(
-          property,
-          rule.style.getPropertyValue(property),
-          rule.style.getPropertyPriority(property)
-        );
-      });
-    });
+    // const declaration = new CSSStyleDeclaration();
+    // const { forEach } = Array.prototype;
+    // const { style } = elt;
 
-    // https://drafts.csswg.org/cssom/#dom-window-getcomputedstyle
-    const declarations = Object.keys(propertiesWithResolvedValueImplemented);
-    forEach.call(declarations, property => {
-      declaration.setProperty(property, getResolvedValue(elt, property));
-    });
+    // forEachMatchingSheetRuleOfElement(elt, rule => {
+    //   forEach.call(rule.style, property => {
+    //     declaration.setProperty(
+    //       property,
+    //       rule.style.getPropertyValue(property),
+    //       rule.style.getPropertyPriority(property)
+    //     );
+    //   });
+    // });
 
-    forEach.call(style, property => {
-      declaration.setProperty(property, style.getPropertyValue(property), style.getPropertyPriority(property));
-    });
+    // // https://drafts.csswg.org/cssom/#dom-window-getcomputedstyle
+    // const declarations = Object.keys(propertiesWithResolvedValueImplemented);
+    // forEach.call(declarations, property => {
+    //   declaration.setProperty(property, getResolvedValue(elt, property));
+    // });
 
-    return declaration;
+    // forEach.call(style, property => {
+    //   declaration.setProperty(property, style.getPropertyValue(property), style.getPropertyPriority(property));
+    // });
+
+    // return declaration;
   };
 
   this.getSelection = function () {
@@ -932,28 +948,29 @@ function Window(options) {
 
   // ### INITIALIZATION
 
-  process.nextTick(() => {
-    if (!window.document) {
-      return; // window might've been closed already
-    }
+  // NOT IMPLEMENTED
+  // process.nextTick(() => {
+  //   if (!window.document) {
+  //     return; // window might've been closed already
+  //   }
 
-    if (window.document.readyState === "complete") {
-      fireAnEvent("load", window, undefined, {}, true);
-    } else {
-      window.document.addEventListener("load", () => {
-        fireAnEvent("load", window, undefined, {}, true);
-        if (!window._document) {
-          return; // window might've been closed already
-        }
+  //   if (window.document.readyState === "complete") {
+  //     fireAnEvent("load", window, undefined, {}, true);
+  //   } else {
+  //     window.document.addEventListener("load", () => {
+  //       fireAnEvent("load", window, undefined, {}, true);
+  //       if (!window._document) {
+  //         return; // window might've been closed already
+  //       }
 
-        const documentImpl = idlUtils.implForWrapper(window._document);
-        if (!documentImpl._pageShowingFlag) {
-          documentImpl._pageShowingFlag = true;
-          fireAPageTransitionEvent("pageshow", window, false);
-        }
-      });
-    }
-  });
+  //       const documentImpl = idlUtils.implForWrapper(window._document);
+  //       if (!documentImpl._pageShowingFlag) {
+  //         documentImpl._pageShowingFlag = true;
+  //         fireAPageTransitionEvent("pageshow", window, false);
+  //       }
+  //     });
+  //   }
+  // });
 }
 
 function contextifyWindow(window) {

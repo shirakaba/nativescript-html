@@ -1,23 +1,23 @@
 "use strict";
-const path = require("path");
-const whatwgURL = require("whatwg-url");
+// const path = require("path");
+// const whatwgURL = require("whatwg-url");
 const { domSymbolTree } = require("./living/helpers/internal-constants");
 const SYMBOL_TREE_POSITION = require("symbol-tree").TreePosition;
 
 exports.hasWeakRefs = typeof WeakRef === "function";
 
-exports.toFileUrl = function (fileName) {
-  // Beyond just the `path.resolve`, this is mostly for the benefit of Windows,
-  // where we need to convert "\" to "/" and add an extra "/" prefix before the
-  // drive letter.
-  let pathname = path.resolve(process.cwd(), fileName).replace(/\\/g, "/");
-  if (pathname[0] !== "/") {
-    pathname = "/" + pathname;
-  }
+// exports.toFileUrl = function (fileName) {
+//   // Beyond just the `path.resolve`, this is mostly for the benefit of Windows,
+//   // where we need to convert "\" to "/" and add an extra "/" prefix before the
+//   // drive letter.
+//   let pathname = path.resolve(process.cwd(), fileName).replace(/\\/g, "/");
+//   if (pathname[0] !== "/") {
+//     pathname = "/" + pathname;
+//   }
 
-  // path might contain spaces, so convert those to %20
-  return "file://" + encodeURI(pathname);
-};
+//   // path might contain spaces, so convert those to %20
+//   return "file://" + encodeURI(pathname);
+// };
 
 /**
  * Define a set of properties on an object, by copying the property descriptors
@@ -107,12 +107,12 @@ exports.memoizeQuery = function memoizeQuery(fn) {
   };
 };
 
-function isValidAbsoluteURL(str) {
-  return whatwgURL.parseURL(str) !== null;
-}
+// function isValidAbsoluteURL(str) {
+//   return whatwgURL.parseURL(str) !== null;
+// }
 
 exports.isValidTargetOrigin = function (str) {
-  return str === "*" || str === "/" || isValidAbsoluteURL(str);
+  return str === "*" || str === "/"// || isValidAbsoluteURL(str);
 };
 
 exports.simultaneousIterators = function* (first, second) {
@@ -149,17 +149,17 @@ exports.treeOrderSorter = function (a, b) {
 /* eslint-disable global-require */
 
 exports.Canvas = null;
-let canvasInstalled = false;
-try {
-  require.resolve("canvas");
-  canvasInstalled = true;
-} catch (e) {
-  // canvas is not installed
-}
-if (canvasInstalled) {
-  const Canvas = require("canvas");
-  if (typeof Canvas.createCanvas === "function") {
-    // In browserify, the require will succeed but return an empty object
-    exports.Canvas = Canvas;
-  }
-}
+// let canvasInstalled = false;
+// try {
+//   require.resolve("canvas");
+//   canvasInstalled = true;
+// } catch (e) {
+//   // canvas is not installed
+// }
+// if (canvasInstalled) {
+//   const Canvas = require("canvas");
+//   if (typeof Canvas.createCanvas === "function") {
+//     // In browserify, the require will succeed but return an empty object
+//     exports.Canvas = Canvas;
+//   }
+// }

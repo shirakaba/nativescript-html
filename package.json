@@ -33,7 +33,13 @@
     "abab": "^2.0.5",
     "cssom": "^0.5.0",
     "domexception": "^4.0.0",
+    "is-potential-custom-element-name": "^1.0.1",
     "jsdom": "^19.0.0",
-    "webidl-conversions": "^7.0.0"
+    "nwsapi": "^2.2.0",
+    "parse5": "^6.0.1",
+    "saxes": "^6.0.0",
+    "w3c-xmlserializer": "^3.0.0",
+    "webidl-conversions": "^7.0.0",
+    "xml-name-validator": "^4.0.0"
   }
 }

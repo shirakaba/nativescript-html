@@ -7,11 +7,11 @@ logic, and to set up your page’s data binding.
 import { NavigatedData, Page } from '@nativescript/core'
 
 import { HomeViewModel } from './home-view-model'
-import { shim } from 'nativescript-dom';
+import { installInterfaces } from 'nativescript-dom';
 
 export function onNavigatingTo(args: NavigatedData) {
   const page = <Page>args.object
 
   page.bindingContext = new HomeViewModel()
-  shim();
+  installInterfaces(global, ["Window"]);
 }

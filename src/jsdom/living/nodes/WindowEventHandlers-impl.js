@@ -3,31 +3,31 @@
 const { createEventAccessor } = require("../helpers/create-event-accessor");
 
 const events = new Set([
-  // WindowEventHandlers
-  "afterprint",
-  "beforeprint",
-  "beforeunload",
-  "hashchange",
-  "languagechange",
-  "message",
-  "messageerror",
-  "offline",
-  "online",
-  "pagehide",
-  "pageshow",
-  "popstate",
-  "rejectionhandled",
-  "storage",
-  "unhandledrejection",
-  "unload",
+  // // WindowEventHandlers
+  // "afterprint",
+  // "beforeprint",
+  // "beforeunload",
+  // "hashchange",
+  // "languagechange",
+  // "message",
+  // "messageerror",
+  // "offline",
+  // "online",
+  // "pagehide",
+  // "pageshow",
+  // "popstate",
+  // "rejectionhandled",
+  // "storage",
+  // "unhandledrejection",
+  // "unload",
 
-  // inherited and overridden
-  "blur",
-  "error",
-  "focus",
-  "load",
-  "resize",
-  "scroll"
+  // // inherited and overridden
+  // "blur",
+  // "error",
+  // "focus",
+  // "load",
+  // "resize",
+  // "scroll"
 ]);
 
 // This class builds on GlobalEventHandlers, which must be mixed in first.

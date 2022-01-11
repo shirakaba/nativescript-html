@@ -7,7 +7,7 @@
 // I'm not sure how much of StyleSheet and Style NativeScript implements.
 // Worth referring to how Svelte Native approached things:
 //   https://github.com/halfnelson/svelte-native/blob/ec6d6b3322222a26dc37bb05a42fcb1e6b163942/src/dom/svelte/StyleElement.ts#L5
-const style = require("../level2/style");
+// const style = require("../level2/style");
 // const xpath = require("../level3/xpath");
 
 // This object defines the mapping between the interface name and the generated interface wrapper code.
@@ -213,7 +213,7 @@ exports.installInterfaces = (window, globalNames) => {
   install(window, "HTMLDocument", window.Document);
 
   // These need to be cleaned up...
-  style.addToCore(window);
+  // style.addToCore(window);
   // xpath(window);
 };
 
