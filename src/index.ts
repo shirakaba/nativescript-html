@@ -1,6 +1,16 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { logger } from "./Logger";
 import type { EventData, ViewBase } from "@nativescript/core";
+const { NamedNodeMap: NamedNodeMap_ } = require("./jsdom/living/attributes/NamedNodeMap-impl");
+const { NodeList: NodeList_ } = require("./jsdom/living/nodes/NodeList-impl");
 
+// @ts-ignore avoid installing node typings just to reference global object
+const globalObject = global;
+
+// TODO: split out into another file. 
 // From https://github.com/shirakaba/react-nativescript/blob/43403fc3d51efe557570bb5a06daced2b09fb408/react-nativescript/src/nativescript-vue-next/runtime/nodes.ts#L187-L227
 export class EventTarget_ implements EventTarget {
   private nativeView: ViewBase|null = null;
@@ -52,44 +62,27 @@ export class EventTarget_ implements EventTarget {
     return !event.cancelable || event.defaultPrevented;
   }
 }
+Object.defineProperty(EventTarget_, 'name', { value: 'EventTarget' });
+Object.defineProperty(globalObject, 'EventTarget', { value: 'EventTarget_' });
 
-/**
- * Warning: this implementation does not support indexing, e.g. nodeList[2].
- * I'm not sure how to implement that; might need Proxy?
- */
-class NodeList_ implements NodeList {
-  [index: number]: Node;
-  private array: Node[] = [];
-  get length(): number {
-    return this.array.length;
-  }
-  item(index: number): Node | null {
-    return this.array[index] || null;
-  }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  forEach(callbackfn: (value: Node, key: number, parent: NodeList) => void, thisArg?: any): void {
-    this.array.forEach((node: Node, index: number) => {
-      callbackfn(node, index, this);
-    });
-  }
-  entries(): IterableIterator<[number, Node]> {
-    return this.array.entries();
-  }
-  keys(): IterableIterator<number> {
-    return this.array.keys();
-  }
-  values(): IterableIterator<Node> {
-    return this.array.values();
-  }
-  [Symbol.iterator](): IterableIterator<Node> {
-    return this.array[Symbol.iterator]();
-  }
-}
-
+// TODO: swap this out for as much of Node-Impl.js as possible.
+// Node.js mainly seems to do sanity checks on input args.
+// Will need to install the npm package "symbol-tree", pulled in by "living/helpers/internal-constants.js".
 export abstract class Node_ extends EventTarget_ implements Node {
+  /** Referred to by jsdom's NodeList implementation. Overridden only by HTMLCollection and SVGListBase, to -1. */
+  _version = 0;
   baseURI = "";
-  // I can't get the generics to be happy, but the implementation is fine.
-  childNodes: NodeListOf<ChildNode> = new NodeList_() as unknown as NodeListOf<ChildNode>;
+  _childNodes: ChildNode[] = [];
+  childNodes: NodeListOf<ChildNode> = new NodeList_(
+    globalObject,
+    [],
+    {
+      element: this,
+      // For a more thorough example of a query (and thus a live node map), see document.getElementsByName:
+      // https://github.com/jsdom/jsdom/blob/04f6c13f4a4d387c7fc979b8f62c6f68d8a0c639/lib/jsdom/living/nodes/Document-impl.js#L502-L504
+      query: () => this._childNodes,
+    }
+  );
   firstChild: ChildNode | null = null;
   isConnected = false;
   lastChild: ChildNode | null = null;
@@ -166,135 +159,12 @@ export abstract class Node_ extends EventTarget_ implements Node {
   PROCESSING_INSTRUCTION_NODE = 7;
   TEXT_NODE = 3;
 }
+Object.defineProperty(Node_, 'name', { value: 'Node' });
+Object.defineProperty(globalObject, 'Node', { value: 'Node_' });
 
-class DOMException_ implements DOMException {
-  constructor(
-    readonly message: string = "",
-    readonly name: string = "Error",
-  ){}
-  get code(): number {
-    switch(this.name){
-      case "INDEX_SIZE_ERR": return this.INDEX_SIZE_ERR;
-      case "DOMSTRING_SIZE_ERR": return this.DOMSTRING_SIZE_ERR;
-      case "HIERARCHY_REQUEST_ERR": return this.HIERARCHY_REQUEST_ERR;
-      case "WRONG_DOCUMENT_ERR": return this.WRONG_DOCUMENT_ERR;
-      case "INVALID_CHARACTER_ERR": return this.INVALID_CHARACTER_ERR;
-      case "NO_DATA_ALLOWED_ERR": return this.NO_DATA_ALLOWED_ERR;
-      case "NO_MODIFICATION_ALLOWED_ERR": return this.NO_MODIFICATION_ALLOWED_ERR;
-      case "NOT_FOUND_ERR": return this.NOT_FOUND_ERR;
-      case "NOT_SUPPORTED_ERR": return this.NOT_SUPPORTED_ERR;
-      case "INUSE_ATTRIBUTE_ERR": return this.INUSE_ATTRIBUTE_ERR;
-      case "INVALID_STATE_ERR": return this.INVALID_STATE_ERR;
-      case "SYNTAX_ERR": return this.SYNTAX_ERR;
-      case "INVALID_MODIFICATION_ERR": return this.INVALID_MODIFICATION_ERR;
-      case "NAMESPACE_ERR": return this.NAMESPACE_ERR;
-      case "INVALID_ACCESS_ERR": return this.INVALID_ACCESS_ERR;
-      case "VALIDATION_ERR": return this.VALIDATION_ERR;
-      case "TYPE_MISMATCH_ERR": return this.TYPE_MISMATCH_ERR;
-      case "SECURITY_ERR": return this.SECURITY_ERR;
-      case "NETWORK_ERR": return this.NETWORK_ERR;
-      case "ABORT_ERR": return this.ABORT_ERR;
-      case "URL_MISMATCH_ERR": return this.URL_MISMATCH_ERR;
-      case "QUOTA_EXCEEDED_ERR": return this.QUOTA_EXCEEDED_ERR;
-      case "TIMEOUT_ERR": return this.TIMEOUT_ERR;
-      case "INVALID_NODE_TYPE_ERR": return this.INVALID_NODE_TYPE_ERR;
-      case "DATA_CLONE_ERR": return this.DATA_CLONE_ERR;
-      default: return 0;
-    }
-  }
-  INDEX_SIZE_ERR = 1;
-  DOMSTRING_SIZE_ERR = 2;
-  HIERARCHY_REQUEST_ERR = 3;
-  WRONG_DOCUMENT_ERR = 4;
-  INVALID_CHARACTER_ERR = 5;
-  NO_DATA_ALLOWED_ERR = 6;
-  NO_MODIFICATION_ALLOWED_ERR = 7;
-  NOT_FOUND_ERR = 8;
-  NOT_SUPPORTED_ERR = 9;
-  INUSE_ATTRIBUTE_ERR = 10;
-  INVALID_STATE_ERR = 11;
-  SYNTAX_ERR = 12;
-  INVALID_MODIFICATION_ERR = 13;
-  NAMESPACE_ERR = 14;
-  INVALID_ACCESS_ERR = 15;
-  VALIDATION_ERR = 16;
-  TYPE_MISMATCH_ERR = 17;
-  SECURITY_ERR = 18;
-  NETWORK_ERR = 19;
-  ABORT_ERR = 20;
-  URL_MISMATCH_ERR = 21;
-  QUOTA_EXCEEDED_ERR = 22;
-  TIMEOUT_ERR = 23;
-  INVALID_NODE_TYPE_ERR = 24;
-  DATA_CLONE_ERR = 25;
-  stack?: string | undefined;
-}
 
-/**
- * I'm a bit unclear on how prefixes and namespaces work, so try to avoid namespaces altogether.
- */
-class NamedNodeMap_ implements NamedNodeMap {
-  [index: number]: Attr;
-  map: Map<string, Attr> = new Map();
-  get length(): number {
-    return Object.keys(this.map).length;
-  }
-  getNamedItem(qualifiedName: string): Attr | null {
-    return this.map.get(qualifiedName) || null;
-  }
-  getNamedItemNS(namespace: string | null, localName: string): Attr | null {
-    const qualifiedName = `${namespace ? `${namespace}:` : ""}${localName}`;
-    return this.getNamedItem(qualifiedName);
-  }
-  item(index: number): Attr | null {
-    return this.map.get(Object.keys(this.map)[index]) || null;
-  }
-  removeNamedItem(qualifiedName: string): Attr {
-    const attr = this.map.get(qualifiedName);
-    if(!attr){
-      throw new DOMException_("", "NOT_FOUND_ERR");
-    }
-    this.map.delete(qualifiedName);
-    return attr;
-  }
-  removeNamedItemNS(namespace: string | null, localName: string): Attr {
-    const qualifiedName = `${namespace ? `${namespace}:` : ""}${localName}`;
-    const attr = this.map.get(qualifiedName);
-    if(!attr){
-      throw new DOMException_("", "NOT_FOUND_ERR");
-    }
-    this.map.delete(qualifiedName);
-    return attr;
-  }
-  setNamedItem(attr: Attr): Attr | null {
-    const {
-      localName,
-      namespaceURI: namespace = null,
-      prefix = null,
-    } = attr;
-    const prefixedNamespace = (prefix && namespace) ? `${prefix}:` : "";
-    const qualifiedName = `${prefixedNamespace}${localName}`;
-    let existingAttr = this.getNamedItem(qualifiedName);
-    if(existingAttr === null){
-      existingAttr = attr;
-    }
-    this.map.set(qualifiedName, attr);
-    return existingAttr;
-  }
-  setNamedItemNS(attr: Attr): Attr | null {
-    return this.setNamedItem(attr);
-  }
-  [Symbol.iterator](): IterableIterator<Attr> {
-    return this.map[Symbol.iterator]();
-  }
-}
-
-/**
- * Warning: this implementation does not support indexing, e.g. nodeList[2].
- * I'm not sure how to implement that; might need Proxy?
- */
 export abstract class Element_ extends Node_ implements Element {
-  attributes: NamedNodeMap;
+  attributes: NamedNodeMap = new NamedNodeMap_(globalObject, [], { element: this });
   classList: DOMTokenList;
   className: string;
   clientHeight: number;

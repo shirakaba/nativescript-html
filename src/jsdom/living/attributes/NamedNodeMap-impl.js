@@ -1,14 +1,17 @@
 /**
- * Forked from https://github.com/jsdom/jsdom/blob/master/lib/jsdom/living/attributes/NamedNodeMap-impl.js
+ * Forked from jsdom's build output from:
+ * https://github.com/jsdom/jsdom/blob/master/lib/jsdom/living/attributes/NamedNodeMap-impl.js
  */
+"use strict";
 
 const DOMException = require("domexception/webidl2js-wrapper");
-const idlUtils = require("../generated/utils.js");
 const attributes = require("../attributes.js");
+const { HTML_NS } = require("../helpers/namespaces");
 
-const HTML_NS = "http://www.w3.org/1999/xhtml";
+const supportedPropertyIndices = Symbol("supported property indices");
+const supportsPropertyName = Symbol("supports property name");
 
-export class NamedNodeMapImpl implements NamedNodeMap {
+exports.NamedNodeMap = class NamedNodeMap {
   constructor(globalObject, args, privateData) {
     this._element = privateData.element;
 
@@ -18,7 +21,7 @@ export class NamedNodeMapImpl implements NamedNodeMap {
     return this._element._attributeList;
   }
 
-  get [idlUtils.supportedPropertyIndices]() {
+  get [supportedPropertyIndices]() {
     return this._attributeList.keys();
   }
   get length() {
@@ -31,7 +34,7 @@ export class NamedNodeMapImpl implements NamedNodeMap {
     return this._attributeList[index];
   }
 
-  get [idlUtils.supportedPropertyNames]() {
+  get [supportedPropertyNames]() {
     const names = new Set(this._attributeList.map(a => a._qualifiedName));
     const el = this._element;
     if (el._namespaceURI === HTML_NS && el._ownerDocument._parsingMode === "html") {
@@ -78,4 +81,4 @@ export class NamedNodeMapImpl implements NamedNodeMap {
     }
     return attr;
   }
-}
+};
