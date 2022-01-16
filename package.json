@@ -29,6 +29,7 @@
     "typescript": "^4.5.4"
   },
   "dependencies": {
-    "domexception": "^4.0.0"
+    "domexception": "^4.0.0",
+    "xml-name-validator": "^4.0.0"
   }
 }

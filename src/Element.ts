@@ -1,40 +1,47 @@
 import { NodeImpl } from "./Node";
 const { NamedNodeMap: NamedNodeMap_ } = require("./jsdom/living/attributes/NamedNodeMap-impl");
+const { DOMTokenList: DOMTokenList_ } = require("./jsdom/living/nodes/DOMTokenList-impl");
+const { HTMLCollection: HTMLCollection_ } = require("./jsdom/living/nodes/HTMLCollection-impl");
 
 // @ts-ignore avoid installing node typings just to reference global object
 const globalObject = global;
 
 export abstract class ElementImpl extends NodeImpl implements Element {
   attributes: NamedNodeMap = new NamedNodeMap_(globalObject, [], { element: this });
-  classList: DOMTokenList;
-  className: string;
-  clientHeight: number;
-  clientLeft: number;
-  clientTop: number;
-  clientWidth: number;
-  id: string;
-  localName: string;
-  namespaceURI: string | null;
-  onfullscreenchange: ((this: Element, ev: Event) => any) | null;
-  onfullscreenerror: ((this: Element, ev: Event) => any) | null;
-  ownerDocument: Document | null;
-  outerHTML: string;
-  part: DOMTokenList;
-  prefix: string | null;
-  scrollHeight: number;
-  scrollLeft: number;
-  scrollTop: number;
-  scrollWidth: number;
-  shadowRoot: ShadowRoot | null;
-  slot: string;
-  tagName: string;
+  classList: DOMTokenList = new DOMTokenList_(globalObject, [], { element: this, attributeLocalName: "classList" });
+  className = "";
+  clientHeight = 0;
+  clientLeft = 0;
+  clientTop = 0;
+  clientWidth = 0;
+  id = "";
+  // Assuming HTML rather than XML, I think localName is effectively the 'p' in <p>.
+  // https://developer.mozilla.org/en-US/docs/Web/API/Element/localName
+  localName!: string;
+  // ... tagName is thus that, to upper case.
+  tagName!: string;
+  namespaceURI: string | null = null;
+  onfullscreenchange: ((this: Element, ev: Event) => any) | null = null;
+  onfullscreenerror: ((this: Element, ev: Event) => any) | null = null;
+  ownerDocument!: Document;
+  get outerHTML(): string {
+    throw new Error("Method not implemented.");
+  }
+  part: DOMTokenList = new DOMTokenList_(globalObject, [], { element: this, attributeLocalName: "part" });
+  prefix: string | null = null;
+  scrollHeight = 0;
+  scrollLeft = 0;
+  scrollTop = 0;
+  scrollWidth = 0;
+  shadowRoot: ShadowRoot | null = null;
+  slot = "";
   attachShadow(init: ShadowRootInit): ShadowRoot {
     throw new Error("Method not implemented.");
   }
   closest<K extends keyof HTMLElementTagNameMap>(selector: K): HTMLElementTagNameMap[K] | null;
   closest<K extends keyof SVGElementTagNameMap>(selector: K): SVGElementTagNameMap[K] | null;
   closest<E extends Element = Element>(selectors: string): E | null;
-  closest(selectors: any): E | HTMLElementTagNameMap[K] | SVGElementTagNameMap[K] | null {
+  closest<K extends keyof (SVGElementTagNameMap|HTMLElementTagNameMap), E extends Element = Element>(selectors: any): E | HTMLElementTagNameMap[K] | SVGElementTagNameMap[K] | null {
     throw new Error("Method not implemented.");
   }
   getAttribute(qualifiedName: string): string | null {
@@ -64,7 +71,7 @@ export abstract class ElementImpl extends NodeImpl implements Element {
   getElementsByTagName<K extends keyof HTMLElementTagNameMap>(qualifiedName: K): HTMLCollectionOf<HTMLElementTagNameMap[K]>;
   getElementsByTagName<K extends keyof SVGElementTagNameMap>(qualifiedName: K): HTMLCollectionOf<SVGElementTagNameMap[K]>;
   getElementsByTagName(qualifiedName: string): HTMLCollectionOf<Element>;
-  getElementsByTagName(qualifiedName: any): HTMLCollectionOf<Element> | HTMLCollectionOf<HTMLElementTagNameMap[K]> | HTMLCollectionOf<SVGElementTagNameMap[K]> {
+  getElementsByTagName<K extends keyof (SVGElementTagNameMap|HTMLElementTagNameMap)>(qualifiedName: any): HTMLCollectionOf<Element> | HTMLCollectionOf<HTMLElementTagNameMap[K]> | HTMLCollectionOf<SVGElementTagNameMap[K]> {
     throw new Error("Method not implemented.");
   }
   getElementsByTagNameNS(namespaceURI: "http://www.w3.org/1999/xhtml", localName: string): HTMLCollectionOf<HTMLElement>;
@@ -209,13 +216,24 @@ export abstract class ElementImpl extends NodeImpl implements Element {
   replaceWith(...nodes: (string | Node)[]): void {
     throw new Error("Method not implemented.");
   }
-  innerHTML: string;
-  nextElementSibling: Element | null;
-  previousElementSibling: Element | null;
-  childElementCount: number;
-  children: HTMLCollection;
-  firstElementChild: Element | null;
-  lastElementChild: Element | null;
+  get innerHTML(): string {
+    throw new Error("Method not implemented.");
+  }
+  nextElementSibling: Element | null = null;
+  previousElementSibling: Element | null = null;
+  childElementCount = 0;
+  children: HTMLCollection = new HTMLCollection_(
+    globalObject,
+    [],
+    {
+      element: this,
+      // For a more thorough example of a query (and thus a live node map), see document.getElementsByName:
+      // https://github.com/jsdom/jsdom/blob/04f6c13f4a4d387c7fc979b8f62c6f68d8a0c639/lib/jsdom/living/nodes/Document-impl.js#L502-L504
+      query: () => this._childNodes.filter(n => n.nodeType === NodeImpl.ELEMENT_NODE),
+    },
+  );
+  firstElementChild: Element | null = null;
+  lastElementChild: Element | null = null;
   append(...nodes: (string | Node)[]): void {
     throw new Error("Method not implemented.");
   }
@@ -225,18 +243,17 @@ export abstract class ElementImpl extends NodeImpl implements Element {
   querySelector<K extends keyof HTMLElementTagNameMap>(selectors: K): HTMLElementTagNameMap[K] | null;
   querySelector<K extends keyof SVGElementTagNameMap>(selectors: K): SVGElementTagNameMap[K] | null;
   querySelector<E extends Element = Element>(selectors: string): E | null;
-  querySelector(selectors: any): E | HTMLElementTagNameMap[K] | SVGElementTagNameMap[K] | null {
+  querySelector<K extends keyof (SVGElementTagNameMap|HTMLElementTagNameMap), E extends Element = Element>(selectors: any): E | HTMLElementTagNameMap[K] | SVGElementTagNameMap[K] | null {
     throw new Error("Method not implemented.");
   }
   querySelectorAll<K extends keyof HTMLElementTagNameMap>(selectors: K): NodeListOf<HTMLElementTagNameMap[K]>;
   querySelectorAll<K extends keyof SVGElementTagNameMap>(selectors: K): NodeListOf<SVGElementTagNameMap[K]>;
   querySelectorAll<E extends Element = Element>(selectors: string): NodeListOf<E>;
-  querySelectorAll(selectors: any): NodeListOf<HTMLElementTagNameMap[K]> | NodeListOf<SVGElementTagNameMap[K]> | NodeListOf<E> {
+  querySelectorAll<K extends keyof (SVGElementTagNameMap|HTMLElementTagNameMap), E extends Element = Element>(selectors: any): NodeListOf<HTMLElementTagNameMap[K]> | NodeListOf<SVGElementTagNameMap[K]> | NodeListOf<E> {
     throw new Error("Method not implemented.");
   }
   replaceChildren(...nodes: (string | Node)[]): void {
     throw new Error("Method not implemented.");
   }
-  assignedSlot: HTMLSlotElement | null;
-
+  assignedSlot: HTMLSlotElement | null = null;
 }

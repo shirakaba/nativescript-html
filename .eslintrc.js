@@ -5,6 +5,7 @@ module.exports = {
       "@typescript-eslint/no-unsafe-call": "off",
       "@typescript-eslint/no-var-requires": "off",
       "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/ban-ts-comment": "off",
     },
     parser: '@typescript-eslint/parser',

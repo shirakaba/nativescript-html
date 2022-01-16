@@ -7,7 +7,7 @@ const globalObject = global;
 // TODO: swap this out for as much of Node-Impl.js as possible.
 // Node.js mainly seems to do sanity checks on input args.
 // Will need to install the npm package "symbol-tree", pulled in by "living/helpers/internal-constants.js".
-export abstract class NodeImpl extends EventTargetImpl implements Node {
+export class NodeImpl extends EventTargetImpl implements Node {
   /** Referred to by jsdom's NodeList implementation. Overridden only by HTMLCollection and SVGListBase, to -1. */
   _version = 0;
   baseURI = "";
@@ -26,8 +26,8 @@ export abstract class NodeImpl extends EventTargetImpl implements Node {
   isConnected = false;
   lastChild: ChildNode | null = null;
   nextSibling: ChildNode | null = null;
-  abstract nodeName: string;
-  abstract nodeType: number;
+  nodeName!: string;
+  nodeType!: number;
   nodeValue: string | null = null;
   ownerDocument: Document | null = null;
   parentElement: HTMLElement | null = null;
@@ -97,4 +97,22 @@ export abstract class NodeImpl extends EventTargetImpl implements Node {
   NOTATION_NODE = 12;
   PROCESSING_INSTRUCTION_NODE = 7;
   TEXT_NODE = 3;
+  static readonly ATTRIBUTE_NODE = 2;
+  static readonly CDATA_SECTION_NODE = 4;
+  static readonly COMMENT_NODE = 8;
+  static readonly DOCUMENT_FRAGMENT_NODE = 11;
+  static readonly DOCUMENT_NODE = 9;
+  static readonly DOCUMENT_POSITION_CONTAINED_BY = 16;
+  static readonly DOCUMENT_POSITION_CONTAINS = 8;
+  static readonly DOCUMENT_POSITION_DISCONNECTED = 1;
+  static readonly DOCUMENT_POSITION_FOLLOWING = 4;
+  static readonly DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC = 32;
+  static readonly DOCUMENT_POSITION_PRECEDING = 2;
+  static readonly DOCUMENT_TYPE_NODE = 10;
+  static readonly ELEMENT_NODE = 1;
+  static readonly ENTITY_NODE = 6;
+  static readonly ENTITY_REFERENCE_NODE = 5;
+  static readonly NOTATION_NODE = 12;
+  static readonly PROCESSING_INSTRUCTION_NODE = 7;
+  static readonly TEXT_NODE = 3;
 }
