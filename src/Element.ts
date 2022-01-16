@@ -6,6 +6,12 @@ const { HTMLCollection: HTMLCollection_ } = require("./jsdom/living/nodes/HTMLCo
 // @ts-ignore avoid installing node typings just to reference global object
 const globalObject = global;
 
+/**
+ * Expects the following to be set post-construction:
+ * - ownerDocument
+ * - localName
+ * - tagName
+ */
 export abstract class ElementImpl extends NodeImpl implements Element {
   attributes: NamedNodeMap = new NamedNodeMap_(globalObject, [], { element: this });
   classList: DOMTokenList = new DOMTokenList_(globalObject, [], { element: this, attributeLocalName: "classList" });

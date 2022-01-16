@@ -1,9 +1,14 @@
 import { ElementImpl } from "./Element";
 const { DOMStringMap: DOMStringMap_ } = require("./jsdom/living/nodes/DOMStringMap-impl");
+const { CSSStyleDeclaration: CSSStyleDeclaration_ } = require("./cssstyle/lib/CSSStyleDeclaration");
 
 // @ts-ignore avoid installing node typings just to reference global object
 const globalObject = global;
 
+/**
+ * Expects the following to be set post-construction:
+ * - style._hostElement (assign a NativeScript View, or just leave as null for a virtual element)
+ */
 export class HTMLElementImpl extends ElementImpl implements HTMLElement {
   accessKey = "";
   accessKeyLabel = "";
@@ -41,7 +46,7 @@ export class HTMLElementImpl extends ElementImpl implements HTMLElement {
   oncopy: ((this: DocumentAndElementEventHandlers, ev: ClipboardEvent) => any) | null = null;
   oncut: ((this: DocumentAndElementEventHandlers, ev: ClipboardEvent) => any) | null = null;
   onpaste: ((this: DocumentAndElementEventHandlers, ev: ClipboardEvent) => any) | null = null;
-  style: CSSStyleDeclaration;
+  style: CSSStyleDeclaration = new CSSStyleDeclaration_();
   contentEditable = "inherit";
   enterKeyHint = "";
   inputMode = "";

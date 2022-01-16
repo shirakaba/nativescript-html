@@ -1,7 +1,11 @@
 import type { EventData, ViewBase } from "@nativescript/core";
 import { logger } from "./Logger";
 
-// From https://github.com/shirakaba/react-nativescript/blob/43403fc3d51efe557570bb5a06daced2b09fb408/react-nativescript/src/nativescript-vue-next/runtime/nodes.ts#L187-L227
+/**
+ * Expects the following to be set up post-construction:
+ * - nativeView (assign a NativeScript ViewBase, or just leave as null for a virtual element)
+ * From https://github.com/shirakaba/react-nativescript/blob/43403fc3d51efe557570bb5a06daced2b09fb408/react-nativescript/src/nativescript-vue-next/runtime/nodes.ts#L187-L227
+ */
 export class EventTargetImpl implements EventTarget {
   private nativeView: ViewBase|null = null;
   private _eventListeners?: Map<string, (args: EventData) => void>;

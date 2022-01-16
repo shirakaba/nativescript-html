@@ -3,3 +3,4 @@ node_modules
 # don't lint build output
 dist
 src/jsdom
+src/cssstyle

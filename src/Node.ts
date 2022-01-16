@@ -4,9 +4,14 @@ const { NodeList: NodeList_ } = require("./jsdom/living/nodes/NodeList-impl");
 // @ts-ignore avoid installing node typings just to reference global object
 const globalObject = global;
 
-// TODO: swap this out for as much of Node-Impl.js as possible.
-// Node.js mainly seems to do sanity checks on input args.
-// Will need to install the npm package "symbol-tree", pulled in by "living/helpers/internal-constants.js".
+// TODO: May need to install the npm package "symbol-tree", pulled in by Node-Impl from "living/helpers/internal-constants.js".
+
+/**
+ * Expects the following to be set post-construction:
+ * - ownerDocument
+ * - nodeName
+ * - nodeType
+ */
 export class NodeImpl extends EventTargetImpl implements Node {
   /** Referred to by jsdom's NodeList implementation. Overridden only by HTMLCollection and SVGListBase, to -1. */
   _version = 0;

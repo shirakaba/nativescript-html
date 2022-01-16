@@ -9,12 +9,35 @@ var allExtraProperties = require('./allExtraProperties');
 var implementedProperties = require('./implementedProperties');
 var { dashedToCamelCase } = require('./parsers');
 var getBasicPropertyDescriptor = require('./utils/getBasicPropertyDescriptor');
+var {
+  visibilityProperty,
+  horizontalAlignmentProperty,
+  verticalAlignmentProperty,
+  backgroundRepeatProperty,
+} = require("@nativescript/core/ui/styling/style-properties");
+
+/**
+ * @see https://github.com/NativeScript/NativeScript/blob/e649a6cfd618c86a1dc7fa84e3197dfb78c3bc74/nativescript-core/ui/styling/style-properties.ts
+ * @see https://github.com/shirakaba/react-nativescript/blob/6f1d8ec741d270128ec578cc7f66a06ef631d22f/react-nativescript/src/shared/CSSPropertyOperations.ts#L24
+ */
+var propertiesWhoseValidatorsDoNotAcceptUnsetValue = {
+  [visibilityProperty.name]: visibilityProperty,
+  [horizontalAlignmentProperty.name]: horizontalAlignmentProperty,
+  [verticalAlignmentProperty.name]: verticalAlignmentProperty,
+  [backgroundRepeatProperty.name]: backgroundRepeatProperty,
+};
 
 /**
  * @constructor
  * @see http://www.w3.org/TR/DOM-Level-2-Style/css.html#CSS-CSSStyleDeclaration
  */
 var CSSStyleDeclaration = function CSSStyleDeclaration(onChangeCallback) {
+  /**
+   * @platform NativeScript
+   * Each style element will support a reference to a NativeScript host element.
+   * @type {import("@nativescript/core").View|null}
+   */
+  this._hostElement = null;
   this._values = {};
   this._importants = {};
   this._length = 0;
@@ -68,6 +91,14 @@ CSSStyleDeclaration.prototype = {
 
     this[lowercaseName] = value;
     this._importants[lowercaseName] = priority;
+    
+    /**
+     * @platform NativeScript
+     * Set the equivalent style on the host element.
+     * Gotcha: users must be careful to preserve the casing, and renderers and other tooling
+     * must be careful not to force it all to lower case before it reaches us.
+     */
+    this._hostElement && this._hostElement.setAttribute(name, value);
   },
   _setProperty: function(name, value, priority) {
     if (value === undefined) {
@@ -92,6 +123,12 @@ CSSStyleDeclaration.prototype = {
     this._values[name] = value;
     this._importants[name] = priority;
     this._onChange(this.cssText);
+
+    /**
+     * @platform NativeScript
+     * I'm not sure whether there's any NativeScript equivalent to this;
+     * I'm unfamiliar with how it handles CSS variables.
+     */
   },
 
   /**
@@ -109,6 +146,17 @@ CSSStyleDeclaration.prototype = {
     var prevValue = this._values[name];
     delete this._values[name];
     delete this._importants[name];
+
+    if(this._hostElement){
+      /**
+       * @platform NativeScript
+       * Remove the equivalent style from the host element.
+       */
+      var matchingProperty = propertiesWhoseValidatorsDoNotAcceptUnsetValue[name];
+      matchingProperty ?
+        this._hostElement.setAttribute(name, matchingProperty.defaultValue) :
+        this._hostElement.removeAttribute(name);
+    }
 
     var index = Array.prototype.indexOf.call(this, name);
     if (index < 0) {
