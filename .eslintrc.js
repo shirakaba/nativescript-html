@@ -2,6 +2,10 @@ module.exports = {
     root: true,
     rules: {
       "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-unsafe-call": "off",
+      "@typescript-eslint/no-var-requires": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/ban-ts-comment": "off",
     },
     parser: '@typescript-eslint/parser',
     parserOptions: {
