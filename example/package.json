@@ -5,7 +5,11 @@
   "private": true,
   "dependencies": {
     "@nativescript/core": "~8.2.0",
-    "@nativescript/theme": "~3.0.2"
+    "@nativescript/theme": "~3.0.2",
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.0",
+    "stream-browserify": "^3.0.0",
+    "util": "^0.12.4"
   },
   "devDependencies": {
     "@nativescript/android": "8.2.3",
