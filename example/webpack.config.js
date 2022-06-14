@@ -16,6 +16,10 @@ module.exports = (env) => {
 		.set(
 			require.resolve("happy-dom/lib/fetch/ResourceFetchHandler"),
 			path.resolve(__dirname, "lib", "ResourceFetchHandler.js"),
+		)
+		.set(
+			"node-fetch",
+			path.resolve(__dirname, "lib", "NodeFetch.js"),
 		);
 	});
 
