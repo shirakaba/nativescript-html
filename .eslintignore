@@ -2,4 +2,6 @@
 node_modules
 # don't lint build output
 dist
+# TODO: find a setting for linting JS files
 .eslintrc.js
+webpack.config.js

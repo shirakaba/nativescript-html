@@ -4,8 +4,11 @@ import HTMLDocument from '../../node_modules/happy-dom/lib/nodes/html-document/H
 console.log('creating document 2...');
 const document = new HTMLDocument();
 console.log('creating div...');
-const div = document.createElement('div');
-console.log(div);
+const divA = document.createElement('div');
+const divB = document.createElement('div');
+divA.appendChild(divB);
+divB.textContent = 'divB text';
+console.log(divA);
 
 Application.run({ moduleName: 'app-root' })
 

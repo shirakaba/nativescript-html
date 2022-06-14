@@ -1,5 +1,5 @@
+const path = require("path");
 const webpack = require("@nativescript/webpack");
-const ProvidePlugin = require.resolve('webpack/lib/ProvidePlugin');
 
 module.exports = (env) => {
 	webpack.init(env);
@@ -8,18 +8,15 @@ module.exports = (env) => {
 	// https://docs.nativescript.org/webpack
 
 	webpack.chainWebpack(config => {
-		config.resolve.set('fallback', {
-			Buffer: require.resolve('buffer'),
-			crypto: require.resolve('crypto-browserify'),
-			util: require.resolve('util'),
-			stream: require.resolve('stream-browserify'),
-		});
-	
-		config
-		.plugin('BufferPlugin') // arbitrary name
-		.use(ProvidePlugin, [
-			{ Buffer: ['buffer', 'Buffer'] },
-		]);
+		// Swap out their ResourceFetchHandler for ours (which uses
+		// NativeScript's global fetch() rather than their Node-based one).
+		// Responsible for this error (that seems to be inconsequential..?):
+		// > Watchpack Error (initial scan): Error: ENOTDIR: not a directory, scandir '/Users/jamie/Documents/git/nativescript-dom/node_modules/happy-dom/lib/fetch/ResourceFetchHandler.js'
+		config.resolve.alias
+		.set(
+			require.resolve("happy-dom/lib/fetch/ResourceFetchHandler"),
+			path.resolve(__dirname, "lib", "ResourceFetchHandler.js"),
+		);
 	});
 
 	return webpack.resolveConfig();
