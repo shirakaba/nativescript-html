@@ -24,10 +24,6 @@ Application.run({ create: () => {
     absoluteLayout.style.width = { unit: 'dip', value: 200 };
 
     stackLayoutWrapper.appendChild(absoluteLayoutWrapper);
-    
-    console.log(stackLayoutWrapper);
-    console.log(stackLayout);
-    console.log(absoluteLayout);
 
     return stackLayout;
 }});
