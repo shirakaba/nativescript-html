@@ -8,6 +8,40 @@ module.exports = (env) => {
 	// https://docs.nativescript.org/webpack
 
 	webpack.chainWebpack(config => {
+		/**
+		 * If you wish to use window.Buffer, set this to `true` and run:
+		 *   npm install --save buffer
+		 */
+		const supportBuffer = false;
+		/**
+		 * If you wish to use window.FileReader, set both this and supportBuffer
+		 * to `true` and run:
+		 *   npm install --save buffer stream-browserify util
+		 */
+		const supportFileReader = false;
+
+		config.resolve.set('fallback', {
+			...{
+				buffer: supportBuffer ? require.resolve('buffer') : false,
+			},
+			...(
+				(supportFileReader && supportBuffer) ?
+					{
+						stream: require.resolve('stream-browserify'),
+						util: require.resolve('util'),
+					} :
+					{}
+			),
+		});
+
+		if(!supportFileReader){
+			config.resolve.alias
+			.set(
+				require.resolve("happy-dom/lib/file/FileReader"),
+				path.resolve(__dirname, "lib", "FileReader.js"),
+			);
+		}
+
 		// Swap out their ResourceFetchHandler for ours (which uses
 		// NativeScript's global fetch() rather than their Node-based one).
 		// Responsible for this error (that seems to be inconsequential..?):
@@ -20,6 +54,14 @@ module.exports = (env) => {
 		.set(
 			"node-fetch",
 			path.resolve(__dirname, "lib", "NodeFetch.js"),
+		)
+		.set(
+			"perf_hooks",
+			path.resolve(__dirname, "lib", "Performance.js"),
+		)
+		.set(
+			"vm",
+			path.resolve(__dirname, "lib", "VM.js"),
 		);
 	});
 
