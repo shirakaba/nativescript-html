@@ -38,7 +38,7 @@ module.exports = (env) => {
 			config.resolve.alias
 			.set(
 				require.resolve("happy-dom/lib/file/FileReader"),
-				path.resolve(__dirname, "lib", "FileReader.js"),
+				"nativescript-dom/lib/FileReader.js",
 			);
 		}
 
@@ -49,23 +49,22 @@ module.exports = (env) => {
 		config.resolve.alias
 		.set(
 			require.resolve("happy-dom/lib/fetch/ResourceFetchHandler"),
-			path.resolve(__dirname, "lib", "ResourceFetchHandler.js"),
+			"nativescript-dom/lib/ResourceFetchHandler.js",
 		)
 		.set(
 			"node-fetch",
-			path.resolve(__dirname, "lib", "NodeFetch.js"),
+			"nativescript-dom/lib/NodeFetch.js",
 		)
 		.set(
 			"perf_hooks",
-			path.resolve(__dirname, "lib", "Performance.js"),
+			"nativescript-dom/lib/Performance.js",
 		)
 		.set(
 			"vm",
-			path.resolve(__dirname, "lib", "VM.js"),
+			"nativescript-dom/lib/VM.js",
 		);
 	});
 
 	return webpack.resolveConfig();
 };
-
 

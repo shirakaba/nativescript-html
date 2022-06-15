@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "A best-effort DOM API for NativeScript",
   "main": "dist/index.js",
+  "files": [
+    "dist",
+    "lib"
+  ],
   "scripts": {
     "lint": "npm run eslint . --ext .js,.jsx,.ts,.tsx",
     "build": "tsc --project ./tsconfig.json",
