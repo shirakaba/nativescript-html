@@ -42,6 +42,15 @@ module.exports = (env) => {
 			);
 		}
 
+		// TODO: find some more sustainable way to ensure that Window, Document,
+		// HTMLElement and everything else is shimmed before custom elements are
+		// registered and userland code is run.
+		config
+		.plugin('DOMShimPlugin') // arbitrary name
+		.use(require.resolve('webpack/lib/ProvidePlugin'), [
+			{ HTMLElement: ['happy-dom/lib/nodes/html-element/HTMLElement.js', 'default'] },
+		]);
+
 		// Swap out their ResourceFetchHandler for ours (which uses
 		// NativeScript's global fetch() rather than their Node-based one).
 		// Responsible for this error (that seems to be inconsequential..?):

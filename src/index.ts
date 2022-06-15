@@ -1,1 +1,1 @@
-console.log("Hello, World");
+export { registerCustomElements, NativeScriptDOMElement, DOMLayoutBase } from "./customElements";
