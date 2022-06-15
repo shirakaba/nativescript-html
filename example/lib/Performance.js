@@ -59,3 +59,4 @@ class Performance {
 
 module.exports = exports = Performance;
 exports.default = exports;
+exports.performance = Performance;

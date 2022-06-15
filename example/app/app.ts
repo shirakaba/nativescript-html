@@ -4,6 +4,8 @@ import HTMLDocument from '../../node_modules/happy-dom/lib/nodes/html-document/H
 
 console.log('creating window...');
 const win = new Window();
+console.log('win.performance.now():', win.performance.now());
+console.log('Date.now():', Date.now());
 console.log('creating document...');
 const document = new HTMLDocument();
 console.log('creating div...');
