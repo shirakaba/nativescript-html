@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/shirakaba/nativescript-dom#readme",
   "dependencies": {
+    "@happy-dom/global-registrator": "^5.3.1",
     "happy-dom": "^5.2.0"
   },
   "peerDependencies": {

@@ -51,6 +51,8 @@ module.exports = (env) => {
 			{ HTMLElement: ['happy-dom/lib/nodes/html-element/HTMLElement.js', 'default'] },
 		]);
 
+		config.entry('bundle').prepend("nativescript-dom");
+
 		// Swap out their ResourceFetchHandler for ours (which uses
 		// NativeScript's global fetch() rather than their Node-based one).
 		// Responsible for this error (that seems to be inconsequential..?):

@@ -1,14 +1,5 @@
-import Window from 'happy-dom/lib/window/Window';
 import { Application, type StackLayout, type AbsoluteLayout } from '@nativescript/core';
-import { registerCustomElements, NativeScriptDOMElement } from 'nativescript-dom';
-
-const win = new Window();
-(global as any).window = win;
-(global as any).document = win.document;
-(global as any).customElements = win.customElements;
-(global as any).HTMLElement = win.HTMLElement;
-
-registerCustomElements();
+import type { NativeScriptDOMElement } from 'nativescript-dom';
 
 Application.run({ create: () => {
     const stackLayoutWrapper = document.createElement('absolute-layout') as NativeScriptDOMElement<StackLayout>;
