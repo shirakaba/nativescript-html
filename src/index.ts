@@ -3,4 +3,4 @@ import { registerCustomElements } from "./customElements";
 
 registerCustomElements();
 
-export { NativeScriptDOMElement, DOMLayoutBase } from "./customElements";
+export { TNSDOMElement, DOMLayoutBase } from "./customElements";
