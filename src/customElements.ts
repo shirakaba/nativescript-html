@@ -7,7 +7,9 @@ import type {
     GridLayout,
     StackLayout,
     WrapLayout,
+    EventData,
 } from "@nativescript/core";
+import { debug } from "./debugLog";
 
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
@@ -19,13 +21,78 @@ import type {
 // one in the hierarchy of:
 //   HTMLElement > Element > Node > EventTarget
 
+type TNSEventListener = (args: EventData) => void;
+
 // Hard to choose between extending from ViewBase or from View.
 // View is the most primitive element that implements _addChildFromBuilder, and
 // moreover is the one that defines and exports the AddChildFromBuilder in the
 // first place.
 export abstract class TNSDOMElement<N extends View> extends HTMLElement {
     abstract readonly nativeView: N;
-    // TODO: EventTarget interface
+
+    /**
+     * We keep references to the event listeners so that the RNS HostConfig can remove any attached event listener if it needs to replace it.
+     */
+    private _nativeEventListeners?: Map<string, TNSEventListener>;
+
+    private get nativeEventListeners(): Map<string, TNSEventListener> {
+        if(!this._nativeEventListeners){
+            this._nativeEventListeners = new Map();
+        }
+        return this._nativeEventListeners;
+    }
+
+    // START EventTarget
+ 
+    addEventListener(
+        event: string,
+        handler: EventListenerOrEventListenerObject | TNSEventListener,
+        options: AddEventListenerOptions = {}
+    ): void
+    {
+        // TODO: call super
+
+        const { capture, once } = options;
+        if (capture) {
+            debug('Bubble propagation is not supported');
+            return;
+        }
+        if (once) {
+            const oldHandler = handler as TNSEventListener;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            handler = (...args: any[]) => {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore 
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+                const res = oldHandler.call(null, ...args);
+                if (res !== null) {
+                    this.removeEventListener(event, handler)
+                }
+            }
+        }
+        this.nativeView.addEventListener(event, handler as TNSEventListener)
+        this.nativeEventListeners.set(event, handler as TNSEventListener);
+    }
+ 
+    removeEventListener(
+        event: string,
+        handler?: EventListenerOrEventListenerObject | TNSEventListener,
+    ): void {
+        // TODO: call super
+
+        this.nativeEventListeners.delete(event);
+        this.nativeView.removeEventListener(event, handler);
+    }
+ 
+    dispatchEvent(event: Event): boolean {
+        // TODO: call super
+        
+        this.nativeView.notify({ eventName: event.type, object: this.nativeView });
+        return true;
+    }
+
+    // END EventTarget
+
     // TODO: Element interface
     // TODO: ElementCSSInlineStyle interface (for HTMLElement and SVGElement)
     // TODO: We probably get Node.textContent and HTMLElement.innerText for
@@ -37,6 +104,8 @@ export abstract class TNSDOMElement<N extends View> extends HTMLElement {
     // The Element methods for attribute-setting will be relatively constant.
 }
 
+// TODO: check whether this class could actually apply more widely to instances
+// of ContainerView, not just LayoutBase.
 export abstract class DOMLayoutBase<N extends LayoutBase> extends TNSDOMElement<N> {
     appendChild<T extends Node>(node: T): T {
         const returnValue = super.appendChild(node);
