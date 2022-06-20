@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import type {
     View,
     LayoutBase,
@@ -30,19 +32,10 @@ type TNSEventListener = (args: EventData) => void;
 export abstract class TNSDOMElement<N extends View> extends HTMLElement {
     abstract readonly nativeView: N;
 
-    /**
-     * We keep references to the event listeners so that the RNS HostConfig can remove any attached event listener if it needs to replace it.
-     */
-    private _nativeEventListeners?: Map<string, TNSEventListener>;
-
-    private get nativeEventListeners(): Map<string, TNSEventListener> {
-        if(!this._nativeEventListeners){
-            this._nativeEventListeners = new Map();
-        }
-        return this._nativeEventListeners;
-    }
-
     // START EventTarget
+	public readonly _nativeEventListeners: {
+		[k: string]: TNSEventListener[];
+	} = {};
  
     addEventListener(
         event: string,
@@ -70,8 +63,10 @@ export abstract class TNSDOMElement<N extends View> extends HTMLElement {
                 }
             }
         }
-        this.nativeView.addEventListener(event, handler as TNSEventListener)
-        this.nativeEventListeners.set(event, handler as TNSEventListener);
+
+        this.nativeView.addEventListener(event, handler as TNSEventListener);
+		this._nativeEventListeners[event] = this._nativeEventListeners[event] || [];
+		this._nativeEventListeners[event].push(handler as TNSEventListener);
     }
  
     removeEventListener(
@@ -80,15 +75,51 @@ export abstract class TNSDOMElement<N extends View> extends HTMLElement {
     ): void {
         // TODO: call super
 
-        this.nativeEventListeners.delete(event);
+		if (this._nativeEventListeners[event]) {
+			const index = this._nativeEventListeners[event].indexOf(handler as TNSEventListener);
+			if (index !== -1) {
+				this._nativeEventListeners[event].splice(index, 1);
+			}
+		}
+        
         this.nativeView.removeEventListener(event, handler);
     }
  
-    dispatchEvent(event: Event): boolean {
+    dispatchEvent(event: Event | EventData): boolean {
         // TODO: call super
+
+		if (!(event as EventData).object) {
+			(event as EventData).object = this.nativeView;
+		}
+
+        // @ts-ignore
+		event.currentTarget = this;
         
-        this.nativeView.notify({ eventName: event.type, object: this.nativeView });
-        return true;
+        // DOM Level 0 Events will be hard to support
+        const eventName = (event as EventData).eventName;
+		const onEventName = `on${eventName.toLowerCase()}`;
+
+        // @ts-ignore
+		if (typeof this[onEventName] === 'function') {
+            // @ts-ignore
+			this[onEventName].call(this, event);
+		}
+
+		if (this._nativeEventListeners[eventName]) {
+			for (const listener of this._nativeEventListeners[eventName]) {
+                listener.call(this, event as EventData);
+				if ((event as any)._immediatePropagationStopped) {
+					return !((event as Event).cancelable && (event as Event).defaultPrevented);
+				}
+			}
+		}
+
+        // FIXME: sort out responsibilities of nativeView.notify() vs. listener.call()
+        // @see https://github.com/NativeScript/NativeScript/blob/75b59ecdbf9ecd7c63684ca72b97b963356952d4/packages/core/data/observable/index.ts#L274
+        // this.nativeView.notify({ eventName, object: this.nativeView });
+
+        // return true;
+		return !((event as Event).cancelable && (event as Event).defaultPrevented);
     }
 
     // END EventTarget
