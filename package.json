@@ -24,16 +24,18 @@
   "homepage": "https://github.com/shirakaba/nativescript-dom#readme",
   "dependencies": {
     "@happy-dom/global-registrator": "^5.3.1",
-    "happy-dom": "^5.2.0"
+    "happy-dom": "^5.2.0",
+    "set-value": "^4.1.0"
   },
   "peerDependencies": {
     "@nativescript/core": "^8.2.4"
   },
   "devDependencies": {
-    "@nativescript/core": "^8.2.4",
+    "@nativescript/core": "^8.5.0",
+    "@types/set-value": "^4.0.1",
     "@typescript-eslint/eslint-plugin": "^5.27.1",
     "@typescript-eslint/parser": "^5.27.1",
     "eslint": "^8.17.0",
-    "typescript": "^4.7.3"
+    "typescript": "^5.0.3"
   }
 }
