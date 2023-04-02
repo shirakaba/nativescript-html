@@ -10,8 +10,9 @@ import {
   StackLayout,
   WrapLayout,
   EventData,
+  Observable,
 } from "@nativescript/core";
-import { debug } from "./debugLog";
+import { Optional } from "@nativescript/core/utils/typescript-utils";
 
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
@@ -23,7 +24,18 @@ import { debug } from "./debugLog";
 // one in the hierarchy of:
 //   HTMLElement > Element > Node > EventTarget
 
-type TNSEventListener = (args: EventData) => void;
+Observable.prototype.notify = function <
+  T extends Optional<EventData, "object">
+>(data: T): void {
+  // For backwards compatibility reasons
+  data.object = data.object || this;
+
+  const { eventName, ...rest } = data;
+  const event = new CustomEvent(eventName, { detail: { ...rest } });
+
+  // Dispatch a DOM Event by reaching out to the implicit DOM container.
+  (this as Dispatcher).dispatchEvent(event);
+};
 
 // Hard to choose between extending from ViewBase or from View.
 // View is the most primitive element that implements _addChildFromBuilder, and
@@ -32,59 +44,73 @@ type TNSEventListener = (args: EventData) => void;
 export abstract class TNSDOMElement<N extends View> extends HTMLElement {
   abstract readonly nativeView: N;
 
-  // START EventTarget
-  public readonly _nativeEventListeners: {
-    [k: string]: TNSEventListener[];
-  } = {};
-
   addEventListener(
-    event: string,
-    handler: EventListenerOrEventListenerObject | TNSEventListener,
-    options: AddEventListenerOptions = {}
+    type: string,
+    callback: EventListenerOrEventListenerObject | null,
+    options?: AddEventListenerOptions | boolean
   ): void {
-    const { capture, once } = options;
-    if (capture) {
-      debug("Bubble propagation is not supported");
+    if (!callback) {
       return;
     }
-    if (once) {
-      const oldHandler = handler as TNSEventListener;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      handler = (...args: any[]) => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        const res = oldHandler.call(null, ...args);
-        if (res !== null) {
-          this.removeEventListener(event, handler);
-        }
-      };
+
+    if (typeof callback !== "function") {
+      throw new TypeError("Callback must be function.");
     }
 
-    this._nativeEventListeners[event] = this._nativeEventListeners[event] || [];
-    this._nativeEventListeners[event].push(handler as TNSEventListener);
-    this.nativeView.addEventListener(event, handler as TNSEventListener);
+    // @ts-ignore private API
+    const list = this.nativeView._getEventList(type, true);
+    const capture = usesCapture(options);
+
+    if (
+      // @ts-ignore private API
+      Observable._indexOfListener(list, callback, usesCapture(options)) >= 0
+    ) {
+      // Don't allow addition of duplicate event listeners.
+      return;
+    }
+
+    list.push({
+      callback,
+      thisArg: capture,
+      // TODO: can optimise by setting properties directly rather than
+      // creating this temporary object just to immediately spread it.
+      ...normalizeEventOptions(options),
+    });
   }
 
   removeEventListener(
-    event: string,
-    handler?: EventListenerOrEventListenerObject | TNSEventListener
+    type: string,
+    callback: EventListenerOrEventListenerObject | null,
+    options?: EventListenerOptions | boolean
   ): void {
-    if (this._nativeEventListeners[event]) {
-      const index = this._nativeEventListeners[event].indexOf(
-        handler as TNSEventListener
-      );
-      if (index !== -1) {
-        this._nativeEventListeners[event].splice(index, 1);
-      }
+    if (!callback) {
+      return;
     }
 
-    this.nativeView.removeEventListener(event, handler as TNSEventListener);
+    if (typeof callback !== "function") {
+      throw new TypeError("Callback must be function.");
+    }
+
+    // @ts-ignore private API
+    const list = this.nativeView._getEventList(type, true);
+    const capture = usesCapture(options);
+
+    const index =
+      // @ts-ignore private API
+      Observable._indexOfListener(list, callback, capture);
+
+    if (index >= 0) {
+      list.splice(index, 1);
+    }
+    if (list.length === 0) {
+      // @ts-ignore private API
+      delete this.nativeView._observers[type];
+    }
   }
 
-  dispatchEvent(event: Event | EventData): boolean {
-    const eventName = (event as EventData).eventName;
-    this.nativeView.notify({ eventName, object: this.nativeView });
+  dispatchEvent(event: Event): boolean {
+    // const eventName = (event as EventData).eventName;
+    this.nativeView.notify({ eventName: event.type, object: this.nativeView });
 
     return true;
   }
@@ -100,6 +126,34 @@ export abstract class TNSDOMElement<N extends View> extends HTMLElement {
 
   // Generally, it's the Node methods that will need reimplementing.
   // The Element methods for attribute-setting will be relatively constant.
+}
+
+function usesCapture(options?: AddEventListenerOptions | boolean): boolean {
+  return typeof options === "object" ? !!options.capture : !!options;
+}
+
+/**
+ * Normalizes options into a AddEventListenerOptions where all fields are
+ * non-optional (`signal` is an explicit undefined).
+ */
+export function normalizeEventOptions(
+  options?: AddEventListenerOptions | boolean
+): AddEventListenerOptions {
+  if (typeof options === "object") {
+    return {
+      once: !!options.once,
+      capture: !!options.capture,
+      passive: !!options.passive,
+      signal: options.signal,
+    };
+  }
+
+  return {
+    once: false,
+    passive: false,
+    signal: undefined,
+    capture: !!options,
+  };
 }
 
 // TODO: check whether this class could actually apply more widely to instances
@@ -143,29 +197,78 @@ export abstract class DOMLayoutBase<
   // ChildNode.before() also use existing methods under-the-hood.
 }
 
+/**
+ * We add the dispatchEvent() method to every Observable, and modify its
+ * notify() method to forward to that instead of the usual flow
+ */
+type Dispatcher<T extends Observable = Observable> = T &
+  Pick<EventTarget, "dispatchEvent">;
+
 export function registerCustomElements(): void {
+  // Give the nativeView a way to directly call the dispatchEvent() method of
+  // its DOM container.
+  const setDispatchEvent = <T extends View>(domElement: TNSDOMElement<T>) => {
+    (domElement.nativeView as Dispatcher<T>).dispatchEvent = (event: Event) =>
+      domElement.dispatchEvent(event);
+  };
+
   class DOMAbsoluteLayout extends DOMLayoutBase<AbsoluteLayout> {
-    readonly nativeView = new (require("@nativescript/core").AbsoluteLayout)();
+    readonly nativeView = new (require("@nativescript/core")
+      .AbsoluteLayout as typeof AbsoluteLayout)();
+    constructor() {
+      super();
+      setDispatchEvent(this);
+    }
   }
   customElements.define("absolute-layout", DOMAbsoluteLayout);
   class DOMDockLayout extends DOMLayoutBase<DockLayout> {
-    readonly nativeView = new (require("@nativescript/core").DockLayout)();
+    readonly nativeView = new (require("@nativescript/core")
+      .DockLayout as typeof DockLayout)();
+
+    constructor() {
+      super();
+      setDispatchEvent(this);
+    }
   }
   customElements.define("dock-layout", DOMDockLayout);
   class DOMFlexboxLayout extends DOMLayoutBase<FlexboxLayout> {
-    readonly nativeView = new (require("@nativescript/core").FlexboxLayout)();
+    readonly nativeView = new (require("@nativescript/core")
+      .FlexboxLayout as typeof FlexboxLayout)();
+
+    constructor() {
+      super();
+      setDispatchEvent(this);
+    }
   }
   customElements.define("flexbox-layout", DOMFlexboxLayout);
   class DOMGridLayout extends DOMLayoutBase<GridLayout> {
-    readonly nativeView = new (require("@nativescript/core").GridLayout)();
+    readonly nativeView = new (require("@nativescript/core")
+      .GridLayout as typeof GridLayout)();
+
+    constructor() {
+      super();
+      setDispatchEvent(this);
+    }
   }
   customElements.define("grid-layout", DOMGridLayout);
   class DOMStackLayout extends DOMLayoutBase<StackLayout> {
-    readonly nativeView = new (require("@nativescript/core").StackLayout)();
+    readonly nativeView = new (require("@nativescript/core")
+      .StackLayout as typeof StackLayout)();
+
+    constructor() {
+      super();
+      setDispatchEvent(this);
+    }
   }
   customElements.define("stack-layout", DOMStackLayout);
   class DOMWrapLayout extends DOMLayoutBase<WrapLayout> {
-    readonly nativeView = new (require("@nativescript/core").WrapLayout)();
+    readonly nativeView = new (require("@nativescript/core")
+      .WrapLayout as typeof WrapLayout)();
+
+    constructor() {
+      super();
+      setDispatchEvent(this);
+    }
   }
   customElements.define("wrap-layout", DOMWrapLayout);
 }
