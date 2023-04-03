@@ -12,6 +12,12 @@ import {
   EventData,
   Observable,
 } from "@nativescript/core";
+import {
+  GestureEventData,
+  GestureTypes,
+  GesturesObserver,
+  fromString as gestureFromString,
+} from "@nativescript/core/ui/gestures";
 import { Optional } from "@nativescript/core/utils/typescript-utils";
 
 /* eslint-disable @typescript-eslint/no-var-requires */
@@ -24,25 +30,14 @@ import { Optional } from "@nativescript/core/utils/typescript-utils";
 // one in the hierarchy of:
 //   HTMLElement > Element > Node > EventTarget
 
-Observable.prototype.notify = function <
-  T extends Optional<EventData, "object">
->(data: T): void {
-  // For backwards compatibility reasons
-  data.object = data.object || this;
-
-  const { eventName, ...rest } = data;
-  const event = new CustomEvent(eventName, { detail: { ...rest } });
-
-  // Dispatch a DOM Event by reaching out to the implicit DOM container.
-  (this as Dispatcher).dispatchEvent(event);
-};
-
 // Hard to choose between extending from ViewBase or from View.
 // View is the most primitive element that implements _addChildFromBuilder, and
 // moreover is the one that defines and exports the AddChildFromBuilder in the
 // first place.
 export abstract class TNSDOMElement<N extends View> extends HTMLElement {
   abstract readonly nativeView: N;
+
+  private readonly gesturesMap = new Map<EventListener, GesturesObserver>();
 
   addEventListener(
     type: string,
@@ -58,14 +53,14 @@ export abstract class TNSDOMElement<N extends View> extends HTMLElement {
     }
 
     // @ts-ignore private API
-    const list = this.nativeView._getEventList(type, true);
+    const list: ListenerEntry[] = this.nativeView._getEventList(type, true);
     const capture = usesCapture(options);
 
     if (
       // @ts-ignore private API
-      Observable._indexOfListener(list, callback, usesCapture(options)) >= 0
+      Observable._indexOfListener(list, callback, capture) >= 0
     ) {
-      // Don't allow addition of duplicate event listeners.
+      // Don't allow addition of duplicate event listeners (unlike Core).
       return;
     }
 
@@ -76,6 +71,30 @@ export abstract class TNSDOMElement<N extends View> extends HTMLElement {
       // creating this temporary object just to immediately spread it.
       ...normalizeEventOptions(options),
     });
+
+    // Gestures are special-cased and so have their own separate event list.
+    const gesture = gestureFromString(type);
+    if (gesture) {
+      const gestureCallback = (args: GestureEventData) => {
+        const { eventName, ...rest } = args;
+        const event = new CustomEvent(eventName, { detail: { ...rest } });
+        this.dispatchEvent(event);
+      };
+
+      // Raise the corresponding DOM Event rather than the user's callback.
+      // Don't bail out yet, because we do still want to register a listener for
+      // that DOM Event. Clever, eh?
+      this.nativeView._observe(gesture, gestureCallback, capture);
+
+      const observers: GesturesObserver[] =
+        this.nativeView._gestureObservers[type];
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const ourObserver = observers[observers.length - 1]!;
+
+      // Keep a record of the gesture observer so that we can remove it later in
+      // removeEventListener().
+      this.gesturesMap.set(callback, ourObserver);
+    }
   }
 
   removeEventListener(
@@ -91,25 +110,47 @@ export abstract class TNSDOMElement<N extends View> extends HTMLElement {
       throw new TypeError("Callback must be function.");
     }
 
-    // @ts-ignore private API
-    const list = this.nativeView._getEventList(type, true);
     const capture = usesCapture(options);
 
-    const index =
+    // @ts-ignore private API
+    const list: ListenerEntry[] = this.nativeView._getEventList(type, true);
+
+    const index: number =
       // @ts-ignore private API
       Observable._indexOfListener(list, callback, capture);
 
-    if (index >= 0) {
-      list.splice(index, 1);
+    if (index === -1) {
+      return;
     }
+
+    list.splice(index, 1);
     if (list.length === 0) {
       // @ts-ignore private API
       delete this.nativeView._observers[type];
     }
+
+    // Gestures are special-cased and so have their own separate event list.
+    const gesture = gestureFromString(type);
+    if (gesture) {
+      const observer = this.gesturesMap.get(callback);
+      if (!observer) {
+        return;
+      }
+
+      // The easy approach would be to just call the private API
+      // `this.nativeView._disconnectGestureObservers()`, but we'll avoid using
+      // it as it removes *all* observers under the name rather than just a
+      // single, specific one!
+      //
+      // If Core ever fixes that bug, we can remove all this code below that
+      // simply copies (and fixes, where appropriate) its implementation.
+      _disconnectGestureObserversPatched(this.nativeView, gesture, observer);
+
+      this.gesturesMap.delete(callback);
+    }
   }
 
   dispatchEvent(event: Event): boolean {
-    // const eventName = (event as EventData).eventName;
     this.nativeView.notify({ eventName: event.type, object: this.nativeView });
 
     return true;
@@ -154,6 +195,68 @@ export function normalizeEventOptions(
     signal: undefined,
     capture: !!options,
   };
+}
+
+/**
+ * Our extension of the internal interface used by Observable.
+ */
+interface ListenerEntry extends AddEventListenerOptions {
+  /**
+   * This property would normally take `(data: EventData) => void;`, but we'll
+   * treat it as an event listener.
+   */
+  callback: EventListener;
+  /**
+   * This property would normally take a `this` context to be bound, but we're
+   * repurposing it for `capture` as it's the only other property examined by
+   * Observable._indexOfListener(). We won't perform any binding of context to
+   * event listeners, just like in DOM.
+   */
+  thisArg: any;
+}
+
+/**
+ * A patch of Observable.prototype._disconnectGestureObservers which allows
+ * removing just a single observer, rather than all of the given type.
+ */
+function _disconnectGestureObserversPatched<N extends View>(
+  nativeView: N,
+  type: GestureTypes,
+  observer: GesturesObserver
+): void {
+  const gestureObservers = nativeView.getGestureObservers(type);
+  const index = gestureObservers?.findIndex((o) => o === observer);
+  if (index > -1) {
+    gestureObservers.splice(index, 1);
+  }
+  if (!gestureObservers?.length) {
+    delete nativeView._gestureObservers[type];
+  }
+
+  // Do the same cleanup up as in GesturesObserver.disconnect().
+
+  // @ts-ignore private
+  observer._detach();
+
+  // @ts-ignore private
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  nativeView.off("loaded", observer._onTargetLoaded);
+
+  // @ts-ignore private
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  nativeView.off("unloaded", observer._onTargetUnloaded);
+
+  // @ts-ignore private
+  observer._onTargetLoaded = null;
+  // @ts-ignore private
+  observer._onTargetUnloaded = null;
+
+  // @ts-ignore private
+  observer._target = null;
+  // @ts-ignore private
+  observer._callback = null;
+  // @ts-ignore private
+  observer._context = null;
 }
 
 // TODO: check whether this class could actually apply more widely to instances
@@ -205,6 +308,27 @@ type Dispatcher<T extends Observable = Observable> = T &
   Pick<EventTarget, "dispatchEvent">;
 
 export function registerCustomElements(): void {
+  // We patch notify() to re-fire all non-user NativeScript events as DOM Events.
+  //
+  // No need to patch on(), off(), once(), addEventListener, or
+  // removeEventListener(), as all they do is insert callbacks into
+  // Observable._observers, which we'll continue to use.
+  Observable.prototype.notify = function <
+    T extends Optional<EventData, "object">
+  >(data: T): void {
+    // For backwards compatibility reasons
+    data.object = data.object || this;
+
+    const { eventName, ...rest } = data;
+    const event = new CustomEvent(eventName, { detail: { ...rest } });
+
+    // Instead of calling handleEvent on all observers (the old methodology), we
+    // dispatch a DOM Event by reaching out to the implicit DOM container. This
+    // effectively moves the responsibility of coordinating the event flow and
+    // event listener handling to the event itself.
+    (this as Dispatcher).dispatchEvent(event);
+  };
+
   // Give the nativeView a way to directly call the dispatchEvent() method of
   // its DOM container.
   const setDispatchEvent = <T extends View>(domElement: TNSDOMElement<T>) => {
