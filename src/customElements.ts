@@ -35,7 +35,7 @@ import { Optional } from "@nativescript/core/utils/typescript-utils";
 // moreover is the one that defines and exports the AddChildFromBuilder in the
 // first place.
 export abstract class TNSDOMElement<N extends View> extends HTMLElement {
-  abstract readonly nativeView: N;
+  abstract readonly view: N;
 
   private readonly gesturesMap = new Map<EventListener, GesturesObserver>();
 
@@ -53,7 +53,7 @@ export abstract class TNSDOMElement<N extends View> extends HTMLElement {
     }
 
     // @ts-ignore private API
-    const list: ListenerEntry[] = this.nativeView._getEventList(type, true);
+    const list: ListenerEntry[] = this.view._getEventList(type, true);
     const capture = usesCapture(options);
 
     if (
@@ -84,10 +84,9 @@ export abstract class TNSDOMElement<N extends View> extends HTMLElement {
       // Raise the corresponding DOM Event rather than the user's callback.
       // Don't bail out yet, because we do still want to register a listener for
       // that DOM Event. Clever, eh?
-      this.nativeView._observe(gesture, gestureCallback, capture);
+      this.view._observe(gesture, gestureCallback, capture);
 
-      const observers: GesturesObserver[] =
-        this.nativeView._gestureObservers[type];
+      const observers: GesturesObserver[] = this.view._gestureObservers[type];
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const ourObserver = observers[observers.length - 1]!;
 
@@ -113,7 +112,7 @@ export abstract class TNSDOMElement<N extends View> extends HTMLElement {
     const capture = usesCapture(options);
 
     // @ts-ignore private API
-    const list: ListenerEntry[] = this.nativeView._getEventList(type, true);
+    const list: ListenerEntry[] = this.view._getEventList(type, true);
 
     const index: number =
       // @ts-ignore private API
@@ -126,7 +125,7 @@ export abstract class TNSDOMElement<N extends View> extends HTMLElement {
     list.splice(index, 1);
     if (list.length === 0) {
       // @ts-ignore private API
-      delete this.nativeView._observers[type];
+      delete this.view._observers[type];
     }
 
     // Gestures are special-cased and so have their own separate event list.
@@ -138,20 +137,20 @@ export abstract class TNSDOMElement<N extends View> extends HTMLElement {
       }
 
       // The easy approach would be to just call the private API
-      // `this.nativeView._disconnectGestureObservers()`, but we'll avoid using
+      // `this.view._disconnectGestureObservers()`, but we'll avoid using
       // it as it removes *all* observers under the name rather than just a
       // single, specific one!
       //
       // If Core ever fixes that bug, we can remove all this code below that
       // simply copies (and fixes, where appropriate) its implementation.
-      _disconnectGestureObserversPatched(this.nativeView, gesture, observer);
+      _disconnectGestureObserversPatched(this.view, gesture, observer);
 
       this.gesturesMap.delete(callback);
     }
   }
 
   dispatchEvent(event: Event): boolean {
-    this.nativeView.notify({ eventName: event.type, object: this.nativeView });
+    this.view.notify({ eventName: event.type, object: this.view });
 
     return true;
   }
@@ -220,17 +219,17 @@ interface ListenerEntry extends AddEventListenerOptions {
  * removing just a single observer, rather than all of the given type.
  */
 function _disconnectGestureObserversPatched<N extends View>(
-  nativeView: N,
+  view: N,
   type: GestureTypes,
   observer: GesturesObserver
 ): void {
-  const gestureObservers = nativeView.getGestureObservers(type);
+  const gestureObservers = view.getGestureObservers(type);
   const index = gestureObservers?.findIndex((o) => o === observer);
   if (index > -1) {
     gestureObservers.splice(index, 1);
   }
   if (!gestureObservers?.length) {
-    delete nativeView._gestureObservers[type];
+    delete view._gestureObservers[type];
   }
 
   // Do the same cleanup up as in GesturesObserver.disconnect().
@@ -240,11 +239,11 @@ function _disconnectGestureObserversPatched<N extends View>(
 
   // @ts-ignore private
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  nativeView.off("loaded", observer._onTargetLoaded);
+  view.off("loaded", observer._onTargetLoaded);
 
   // @ts-ignore private
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  nativeView.off("unloaded", observer._onTargetUnloaded);
+  view.off("unloaded", observer._onTargetUnloaded);
 
   // @ts-ignore private
   observer._onTargetLoaded = null;
@@ -266,25 +265,21 @@ export abstract class DOMLayoutBase<
 > extends TNSDOMElement<N> {
   appendChild<T extends Node>(node: T): T {
     const returnValue = super.appendChild(node);
-    this.nativeView.addChild(
-      (node as unknown as TNSDOMElement<View>).nativeView
-    );
+    this.view.addChild((node as unknown as TNSDOMElement<View>).view);
     return returnValue;
   }
   removeChild<T extends Node>(child: T): T {
     const returnValue = super.removeChild(child);
-    this.nativeView.removeChild(
-      (child as unknown as TNSDOMElement<View>).nativeView
-    );
+    this.view.removeChild((child as unknown as TNSDOMElement<View>).view);
     return returnValue;
   }
   insertBefore<T extends Node>(newNode: T, referenceNode: Node | null): T {
     const returnValue = super.insertBefore(newNode, referenceNode);
-    const childIndex = this.nativeView.getChildIndex(
-      (referenceNode as unknown as TNSDOMElement<View>).nativeView
+    const childIndex = this.view.getChildIndex(
+      (referenceNode as unknown as TNSDOMElement<View>).view
     );
-    this.nativeView.insertChild(
-      (newNode as unknown as TNSDOMElement<View>).nativeView,
+    this.view.insertChild(
+      (newNode as unknown as TNSDOMElement<View>).view,
       childIndex
     );
     return returnValue;
@@ -329,15 +324,15 @@ export function registerCustomElements(): void {
     (this as Dispatcher).dispatchEvent(event);
   };
 
-  // Give the nativeView a way to directly call the dispatchEvent() method of
+  // Give the view a way to directly call the dispatchEvent() method of
   // its DOM container.
   const setDispatchEvent = <T extends View>(domElement: TNSDOMElement<T>) => {
-    (domElement.nativeView as Dispatcher<T>).dispatchEvent = (event: Event) =>
+    (domElement.view as Dispatcher<T>).dispatchEvent = (event: Event) =>
       domElement.dispatchEvent(event);
   };
 
   class DOMAbsoluteLayout extends DOMLayoutBase<AbsoluteLayout> {
-    readonly nativeView = new (require("@nativescript/core")
+    readonly view = new (require("@nativescript/core")
       .AbsoluteLayout as typeof AbsoluteLayout)();
     constructor() {
       super();
@@ -346,7 +341,7 @@ export function registerCustomElements(): void {
   }
   customElements.define("absolute-layout", DOMAbsoluteLayout);
   class DOMDockLayout extends DOMLayoutBase<DockLayout> {
-    readonly nativeView = new (require("@nativescript/core")
+    readonly view = new (require("@nativescript/core")
       .DockLayout as typeof DockLayout)();
 
     constructor() {
@@ -356,7 +351,7 @@ export function registerCustomElements(): void {
   }
   customElements.define("dock-layout", DOMDockLayout);
   class DOMFlexboxLayout extends DOMLayoutBase<FlexboxLayout> {
-    readonly nativeView = new (require("@nativescript/core")
+    readonly view = new (require("@nativescript/core")
       .FlexboxLayout as typeof FlexboxLayout)();
 
     constructor() {
@@ -366,7 +361,7 @@ export function registerCustomElements(): void {
   }
   customElements.define("flexbox-layout", DOMFlexboxLayout);
   class DOMGridLayout extends DOMLayoutBase<GridLayout> {
-    readonly nativeView = new (require("@nativescript/core")
+    readonly view = new (require("@nativescript/core")
       .GridLayout as typeof GridLayout)();
 
     constructor() {
@@ -376,7 +371,7 @@ export function registerCustomElements(): void {
   }
   customElements.define("grid-layout", DOMGridLayout);
   class DOMStackLayout extends DOMLayoutBase<StackLayout> {
-    readonly nativeView = new (require("@nativescript/core")
+    readonly view = new (require("@nativescript/core")
       .StackLayout as typeof StackLayout)();
 
     constructor() {
@@ -386,7 +381,7 @@ export function registerCustomElements(): void {
   }
   customElements.define("stack-layout", DOMStackLayout);
   class DOMWrapLayout extends DOMLayoutBase<WrapLayout> {
-    readonly nativeView = new (require("@nativescript/core")
+    readonly view = new (require("@nativescript/core")
       .WrapLayout as typeof WrapLayout)();
 
     constructor() {
