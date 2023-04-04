@@ -3,13 +3,13 @@ import {
   type StackLayout,
   type AbsoluteLayout,
 } from '@nativescript/core';
-import type { TNSDOMElement } from 'nativescript-dom';
+import type { NHTMLElement } from 'nativescript-dom';
 
 Application.run({
   create: () => {
     const stackLayoutWrapper = document.createElement(
       'absolute-layout'
-    ) as TNSDOMElement<StackLayout>;
+    ) as NHTMLElement<StackLayout>;
     const stackLayout = stackLayoutWrapper.view;
     stackLayout.backgroundColor = 'yellow';
     stackLayout.style.height = { unit: '%', value: 100 };
@@ -17,7 +17,7 @@ Application.run({
 
     const absoluteLayoutWrapper = document.createElement(
       'absolute-layout'
-    ) as TNSDOMElement<AbsoluteLayout>;
+    ) as NHTMLElement<AbsoluteLayout>;
     const absoluteLayout = absoluteLayoutWrapper.view;
     absoluteLayout.backgroundColor = 'orange';
     absoluteLayout.style.height = { unit: 'dip', value: 200 };

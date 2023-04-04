@@ -18,7 +18,7 @@ import {
 } from '@nativescript/core/ui/gestures';
 import { Optional } from '@nativescript/core/utils/typescript-utils';
 
-export abstract class TNSDOMElement<N extends View> extends HTMLElement {
+export abstract class NHTMLElement<N extends View = View> extends HTMLElement {
   abstract readonly view: N;
 
   private readonly gesturesMap = new Map<EventListener, GesturesObserver>();
@@ -243,26 +243,42 @@ function _disconnectGestureObserversPatched<N extends View>(
 // of ContainerView, not just LayoutBase.
 export abstract class DOMLayoutBase<
   N extends LayoutBase
-> extends TNSDOMElement<N> {
+> extends NHTMLElement<N> {
   appendChild<T extends Node>(node: T): T {
     const returnValue = super.appendChild(node);
-    this.view.addChild((node as unknown as TNSDOMElement<View>).view);
+
+    if (node instanceof NHTMLElement) {
+      this.view.addChild(node.view);
+    }
+
     return returnValue;
   }
+
   removeChild<T extends Node>(child: T): T {
     const returnValue = super.removeChild(child);
-    this.view.removeChild((child as unknown as TNSDOMElement<View>).view);
+
+    if (child instanceof NHTMLElement) {
+      this.view.removeChild(child.view);
+    }
+
     return returnValue;
   }
+
   insertBefore<T extends Node>(newNode: T, referenceNode: Node | null): T {
     const returnValue = super.insertBefore(newNode, referenceNode);
-    const childIndex = this.view.getChildIndex(
-      (referenceNode as unknown as TNSDOMElement<View>).view
-    );
-    this.view.insertChild(
-      (newNode as unknown as TNSDOMElement<View>).view,
-      childIndex
-    );
+
+    if (
+      newNode instanceof NHTMLElement &&
+      (referenceNode === null || referenceNode instanceof NHTMLElement)
+    ) {
+      if (referenceNode) {
+        const childIndex = this.view.getChildIndex(referenceNode.view);
+        this.view.insertChild(newNode.view, childIndex);
+      } else {
+        this.view.addChild(newNode.view);
+      }
+    }
+
     return returnValue;
   }
 
@@ -285,7 +301,8 @@ type Dispatcher<T extends Observable = Observable> = T &
   Pick<EventTarget, 'dispatchEvent'>;
 
 export function registerCustomElements(): void {
-  // We patch notify() to re-fire all non-user NativeScript events as DOM Events.
+  // We patch notify() to re-fire all non-user NativeScript events as DOM
+  // Events.
   //
   // No need to patch on(), off(), once(), addEventListener, or
   // removeEventListener(), as all they do is insert callbacks into
@@ -306,9 +323,9 @@ export function registerCustomElements(): void {
     (this as Dispatcher).dispatchEvent(event);
   };
 
-  // Give the view a way to directly call the dispatchEvent() method of
-  // its DOM container.
-  const setDispatchEvent = <T extends View>(domElement: TNSDOMElement<T>) => {
+  // Give the view a way to directly call the dispatchEvent() method of its DOM
+  // container.
+  const setDispatchEvent = <T extends View>(domElement: NHTMLElement<T>) => {
     (domElement.view as Dispatcher<T>).dispatchEvent = (event: Event) =>
       domElement.dispatchEvent(event);
   };

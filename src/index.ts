@@ -3,4 +3,4 @@ import { registerCustomElements } from './customElements';
 
 registerCustomElements();
 
-export { TNSDOMElement, DOMLayoutBase } from './customElements';
+export { NHTMLElement, DOMLayoutBase } from './customElements';
