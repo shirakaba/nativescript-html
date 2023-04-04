@@ -1,8 +1,7 @@
-# don't ever lint node_modules
 node_modules
-# don't lint build output
 dist
-# TODO: find a setting for linting JS files
-.eslintrc.js
+lib
+
+# It's a pain to lint anything that isn't included by a tsconfig.json
 webpack.config.js
-example
+nativescript.config.ts

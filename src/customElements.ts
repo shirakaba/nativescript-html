@@ -11,14 +11,14 @@ import {
   WrapLayout,
   EventData,
   Observable,
-} from "@nativescript/core";
+} from '@nativescript/core';
 import {
   GestureEventData,
   GestureTypes,
   GesturesObserver,
   fromString as gestureFromString,
-} from "@nativescript/core/ui/gestures";
-import { Optional } from "@nativescript/core/utils/typescript-utils";
+} from '@nativescript/core/ui/gestures';
+import { Optional } from '@nativescript/core/utils/typescript-utils';
 
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
@@ -48,8 +48,8 @@ export abstract class TNSDOMElement<N extends View> extends HTMLElement {
       return;
     }
 
-    if (typeof callback !== "function") {
-      throw new TypeError("Callback must be function.");
+    if (typeof callback !== 'function') {
+      throw new TypeError('Callback must be function.');
     }
 
     // @ts-ignore private API
@@ -105,8 +105,8 @@ export abstract class TNSDOMElement<N extends View> extends HTMLElement {
       return;
     }
 
-    if (typeof callback !== "function") {
-      throw new TypeError("Callback must be function.");
+    if (typeof callback !== 'function') {
+      throw new TypeError('Callback must be function.');
     }
 
     const capture = usesCapture(options);
@@ -169,7 +169,7 @@ export abstract class TNSDOMElement<N extends View> extends HTMLElement {
 }
 
 function usesCapture(options?: AddEventListenerOptions | boolean): boolean {
-  return typeof options === "object" ? !!options.capture : !!options;
+  return typeof options === 'object' ? !!options.capture : !!options;
 }
 
 /**
@@ -179,7 +179,7 @@ function usesCapture(options?: AddEventListenerOptions | boolean): boolean {
 export function normalizeEventOptions(
   options?: AddEventListenerOptions | boolean
 ): AddEventListenerOptions {
-  if (typeof options === "object") {
+  if (typeof options === 'object') {
     return {
       once: !!options.once,
       capture: !!options.capture,
@@ -239,11 +239,11 @@ function _disconnectGestureObserversPatched<N extends View>(
 
   // @ts-ignore private
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  view.off("loaded", observer._onTargetLoaded);
+  view.off('loaded', observer._onTargetLoaded);
 
   // @ts-ignore private
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  view.off("unloaded", observer._onTargetUnloaded);
+  view.off('unloaded', observer._onTargetUnloaded);
 
   // @ts-ignore private
   observer._onTargetLoaded = null;
@@ -300,7 +300,7 @@ export abstract class DOMLayoutBase<
  * notify() method to forward to that instead of the usual flow
  */
 type Dispatcher<T extends Observable = Observable> = T &
-  Pick<EventTarget, "dispatchEvent">;
+  Pick<EventTarget, 'dispatchEvent'>;
 
 export function registerCustomElements(): void {
   // We patch notify() to re-fire all non-user NativeScript events as DOM Events.
@@ -309,7 +309,7 @@ export function registerCustomElements(): void {
   // removeEventListener(), as all they do is insert callbacks into
   // Observable._observers, which we'll continue to use.
   Observable.prototype.notify = function <
-    T extends Optional<EventData, "object">
+    T extends Optional<EventData, 'object'>
   >(data: T): void {
     // For backwards compatibility reasons
     data.object = data.object || this;
@@ -332,16 +332,16 @@ export function registerCustomElements(): void {
   };
 
   class DOMAbsoluteLayout extends DOMLayoutBase<AbsoluteLayout> {
-    readonly view = new (require("@nativescript/core")
+    readonly view = new (require('@nativescript/core')
       .AbsoluteLayout as typeof AbsoluteLayout)();
     constructor() {
       super();
       setDispatchEvent(this);
     }
   }
-  customElements.define("absolute-layout", DOMAbsoluteLayout);
+  customElements.define('absolute-layout', DOMAbsoluteLayout);
   class DOMDockLayout extends DOMLayoutBase<DockLayout> {
-    readonly view = new (require("@nativescript/core")
+    readonly view = new (require('@nativescript/core')
       .DockLayout as typeof DockLayout)();
 
     constructor() {
@@ -349,9 +349,9 @@ export function registerCustomElements(): void {
       setDispatchEvent(this);
     }
   }
-  customElements.define("dock-layout", DOMDockLayout);
+  customElements.define('dock-layout', DOMDockLayout);
   class DOMFlexboxLayout extends DOMLayoutBase<FlexboxLayout> {
-    readonly view = new (require("@nativescript/core")
+    readonly view = new (require('@nativescript/core')
       .FlexboxLayout as typeof FlexboxLayout)();
 
     constructor() {
@@ -359,9 +359,9 @@ export function registerCustomElements(): void {
       setDispatchEvent(this);
     }
   }
-  customElements.define("flexbox-layout", DOMFlexboxLayout);
+  customElements.define('flexbox-layout', DOMFlexboxLayout);
   class DOMGridLayout extends DOMLayoutBase<GridLayout> {
-    readonly view = new (require("@nativescript/core")
+    readonly view = new (require('@nativescript/core')
       .GridLayout as typeof GridLayout)();
 
     constructor() {
@@ -369,9 +369,9 @@ export function registerCustomElements(): void {
       setDispatchEvent(this);
     }
   }
-  customElements.define("grid-layout", DOMGridLayout);
+  customElements.define('grid-layout', DOMGridLayout);
   class DOMStackLayout extends DOMLayoutBase<StackLayout> {
-    readonly view = new (require("@nativescript/core")
+    readonly view = new (require('@nativescript/core')
       .StackLayout as typeof StackLayout)();
 
     constructor() {
@@ -379,9 +379,9 @@ export function registerCustomElements(): void {
       setDispatchEvent(this);
     }
   }
-  customElements.define("stack-layout", DOMStackLayout);
+  customElements.define('stack-layout', DOMStackLayout);
   class DOMWrapLayout extends DOMLayoutBase<WrapLayout> {
-    readonly view = new (require("@nativescript/core")
+    readonly view = new (require('@nativescript/core')
       .WrapLayout as typeof WrapLayout)();
 
     constructor() {
@@ -389,5 +389,5 @@ export function registerCustomElements(): void {
       setDispatchEvent(this);
     }
   }
-  customElements.define("wrap-layout", DOMWrapLayout);
+  customElements.define('wrap-layout', DOMWrapLayout);
 }
