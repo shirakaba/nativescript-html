@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import {
   View,
   LayoutBase,
@@ -20,20 +18,6 @@ import {
 } from '@nativescript/core/ui/gestures';
 import { Optional } from '@nativescript/core/utils/typescript-utils';
 
-/* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-// TODO: it'll probably make sense to make a NativeScript equivalent for each
-// one in the hierarchy of:
-//   HTMLElement > Element > Node > EventTarget
-
-// Hard to choose between extending from ViewBase or from View.
-// View is the most primitive element that implements _addChildFromBuilder, and
-// moreover is the one that defines and exports the AddChildFromBuilder in the
-// first place.
 export abstract class TNSDOMElement<N extends View> extends HTMLElement {
   abstract readonly view: N;
 
@@ -52,13 +36,18 @@ export abstract class TNSDOMElement<N extends View> extends HTMLElement {
       throw new TypeError('Callback must be function.');
     }
 
-    // @ts-ignore private API
-    const list: ListenerEntry[] = this.view._getEventList(type, true);
+    const list = (this.view as unknown as ViewPrivate)._getEventList(
+      type,
+      true
+    );
     const capture = usesCapture(options);
 
     if (
-      // @ts-ignore private API
-      Observable._indexOfListener(list, callback, capture) >= 0
+      (Observable as unknown as typeof ObservablePrivate)._indexOfListener(
+        list,
+        callback,
+        capture
+      ) >= 0
     ) {
       // Don't allow addition of duplicate event listeners (unlike Core).
       return;
@@ -67,9 +56,10 @@ export abstract class TNSDOMElement<N extends View> extends HTMLElement {
     list.push({
       callback,
       thisArg: capture,
-      // TODO: can optimise by setting properties directly rather than
-      // creating this temporary object just to immediately spread it.
-      ...normalizeEventOptions(options),
+      once: typeof options === 'object' ? !!options.once : false,
+      capture: typeof options === 'object' ? !!options.capture : false,
+      passive: typeof options === 'object' ? !!options.passive : false,
+      signal: typeof options === 'object' ? options.signal : undefined,
     });
 
     // Gestures are special-cased and so have their own separate event list.
@@ -86,8 +76,9 @@ export abstract class TNSDOMElement<N extends View> extends HTMLElement {
       // that DOM Event. Clever, eh?
       this.view._observe(gesture, gestureCallback, capture);
 
-      const observers: GesturesObserver[] = this.view._gestureObservers[type];
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const observers = (this.view as unknown as ViewPrivate)._gestureObservers[
+        gesture
+      ];
       const ourObserver = observers[observers.length - 1]!;
 
       // Keep a record of the gesture observer so that we can remove it later in
@@ -111,12 +102,14 @@ export abstract class TNSDOMElement<N extends View> extends HTMLElement {
 
     const capture = usesCapture(options);
 
-    // @ts-ignore private API
-    const list: ListenerEntry[] = this.view._getEventList(type, true);
+    const list = (this.view as unknown as ViewPrivate)._getEventList(
+      type,
+      true
+    );
 
-    const index: number =
-      // @ts-ignore private API
-      Observable._indexOfListener(list, callback, capture);
+    const index = (
+      Observable as unknown as typeof ObservablePrivate
+    )._indexOfListener(list, callback, capture);
 
     if (index === -1) {
       return;
@@ -124,8 +117,7 @@ export abstract class TNSDOMElement<N extends View> extends HTMLElement {
 
     list.splice(index, 1);
     if (list.length === 0) {
-      // @ts-ignore private API
-      delete this.view._observers[type];
+      delete (this.view as unknown as ViewPrivate)._observers[type];
     }
 
     // Gestures are special-cased and so have their own separate event list.
@@ -136,13 +128,7 @@ export abstract class TNSDOMElement<N extends View> extends HTMLElement {
         return;
       }
 
-      // The easy approach would be to just call the private API
-      // `this.view._disconnectGestureObservers()`, but we'll avoid using
-      // it as it removes *all* observers under the name rather than just a
-      // single, specific one!
-      //
-      // If Core ever fixes that bug, we can remove all this code below that
-      // simply copies (and fixes, where appropriate) its implementation.
+      // Use our patch of `this.view._disconnectGestureObservers()`.
       _disconnectGestureObserversPatched(this.view, gesture, observer);
 
       this.gesturesMap.delete(callback);
@@ -172,28 +158,32 @@ function usesCapture(options?: AddEventListenerOptions | boolean): boolean {
   return typeof options === 'object' ? !!options.capture : !!options;
 }
 
-/**
- * Normalizes options into a AddEventListenerOptions where all fields are
- * non-optional (`signal` is an explicit undefined).
- */
-export function normalizeEventOptions(
-  options?: AddEventListenerOptions | boolean
-): AddEventListenerOptions {
-  if (typeof options === 'object') {
-    return {
-      once: !!options.once,
-      capture: !!options.capture,
-      passive: !!options.passive,
-      signal: options.signal,
-    };
-  }
+declare class ObservablePrivate {
+  readonly _observers: Record<string, ListenerEntry[]>;
 
-  return {
-    once: false,
-    passive: false,
-    signal: undefined,
-    capture: !!options,
-  };
+  static _indexOfListener(
+    list: ListenerEntry[],
+    callback: EventListener,
+    capture?: boolean
+  ): number;
+
+  _getEventList<T extends boolean>(
+    eventName: string,
+    createIfNeeded?: T
+  ): T extends true ? ListenerEntry[] : ListenerEntry[] | undefined;
+}
+
+declare class GesturesObserverPrivate {
+  _callback: null | ((args: GestureEventData) => void);
+  _context: any;
+  _detach(): void;
+  _onTargetLoaded: null | ((data: EventData) => void);
+  _onTargetUnloaded: null | ((data: EventData) => void);
+  _target: View | null;
+}
+
+declare class ViewPrivate extends ObservablePrivate {
+  readonly _gestureObservers: Record<GestureTypes, GesturesObserver[]>;
 }
 
 /**
@@ -232,30 +222,21 @@ function _disconnectGestureObserversPatched<N extends View>(
     delete view._gestureObservers[type];
   }
 
+  const observerPrivate = observer as unknown as GesturesObserverPrivate;
+
   // Do the same cleanup up as in GesturesObserver.disconnect().
 
-  // @ts-ignore private
-  observer._detach();
+  observerPrivate._detach();
 
-  // @ts-ignore private
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  view.off('loaded', observer._onTargetLoaded);
+  view.off('loaded', observerPrivate._onTargetLoaded!);
+  view.off('unloaded', observerPrivate._onTargetUnloaded!);
 
-  // @ts-ignore private
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  view.off('unloaded', observer._onTargetUnloaded);
+  observerPrivate._onTargetLoaded = null;
+  observerPrivate._onTargetUnloaded = null;
 
-  // @ts-ignore private
-  observer._onTargetLoaded = null;
-  // @ts-ignore private
-  observer._onTargetUnloaded = null;
-
-  // @ts-ignore private
-  observer._target = null;
-  // @ts-ignore private
-  observer._callback = null;
-  // @ts-ignore private
-  observer._context = null;
+  observerPrivate._target = null;
+  observerPrivate._callback = null;
+  observerPrivate._context = null;
 }
 
 // TODO: check whether this class could actually apply more widely to instances
@@ -284,6 +265,7 @@ export abstract class DOMLayoutBase<
     );
     return returnValue;
   }
+
   // Node.replaceChild() is fine as-is, as it calls Node.insertBefore()
   // followed by Node.removeChild() (both of which we've reimplemented)
 
@@ -331,6 +313,7 @@ export function registerCustomElements(): void {
       domElement.dispatchEvent(event);
   };
 
+  /* eslint-disable @typescript-eslint/no-var-requires */
   class DOMAbsoluteLayout extends DOMLayoutBase<AbsoluteLayout> {
     readonly view = new (require('@nativescript/core')
       .AbsoluteLayout as typeof AbsoluteLayout)();
