@@ -135,11 +135,16 @@ export abstract class NHTMLElement<N extends View = View> extends HTMLElement {
     }
   }
 
-  dispatchEvent(event: Event): boolean {
-    this.view.notify({ eventName: event.type, object: this.view });
+  // FIXME: happy-dom's EventTarget.dispatchEvent checks
+  // `this._listeners[event.type]`, intending to call handleEvent on any
+  // corresponding listeners. We should reimplement dispatchEvent to do all of
+  // that.
+  //
+  // dispatchEvent(event: Event): boolean {
+  //   this.view.notify({ eventName: event.type, object: this.view });
 
-    return true;
-  }
+  //   return true;
+  // }
 
   // END EventTarget
 
@@ -301,6 +306,16 @@ type Dispatcher<T extends Observable = Observable> = T &
   Pick<EventTarget, 'dispatchEvent'>;
 
 export function registerCustomElements(): void {
+  const on = Observable.prototype.on;
+  Observable.prototype.on = function (
+    eventNames: string,
+    callback: (data: EventData) => void,
+    thisArg?: any
+  ): void {
+    console.log(`${this.constructor.name}.on('${eventNames}')`);
+    on.call(this, eventNames, callback, thisArg);
+  };
+
   // We patch notify() to re-fire all non-user NativeScript events as DOM
   // Events.
   //
@@ -320,7 +335,18 @@ export function registerCustomElements(): void {
     // dispatch a DOM Event by reaching out to the implicit DOM container. This
     // effectively moves the responsibility of coordinating the event flow and
     // event listener handling to the event itself.
-    (this as Dispatcher).dispatchEvent(event);
+
+    if ((this as Dispatcher).dispatchEvent) {
+      console.log(
+        `calling ${this.constructor.name}.dispatchEvent('${eventName}')...`
+      );
+      // It's a View that we've wrapped
+      (this as Dispatcher).dispatchEvent(event);
+    } else {
+      console.log(`calling window.dispatchEvent('${eventName}')...`);
+      // It's some other Core Observable
+      window.dispatchEvent(event);
+    }
   };
 
   // Give the view a way to directly call the dispatchEvent() method of its DOM
@@ -332,8 +358,11 @@ export function registerCustomElements(): void {
 
   /* eslint-disable @typescript-eslint/no-var-requires */
   class DOMAbsoluteLayout extends DOMLayoutBase<AbsoluteLayout> {
+    // FIXME: this fires the 'created' event before we've set dispatchEvent upon
+    // it, so we need to somehow resolve that.
     readonly view = new (require('@nativescript/core')
       .AbsoluteLayout as typeof AbsoluteLayout)();
+
     constructor() {
       super();
       setDispatchEvent(this);

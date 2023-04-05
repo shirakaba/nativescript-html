@@ -7,25 +7,35 @@ import type { NHTMLElement } from 'nativescript-dom';
 
 Application.run({
   create: () => {
-    const stackLayoutWrapper = document.createElement(
-      'absolute-layout'
+    const sl = document.createElement(
+      'stack-layout'
     ) as NHTMLElement<StackLayout>;
-    const stackLayout = stackLayoutWrapper.view;
-    stackLayout.backgroundColor = 'yellow';
-    stackLayout.style.height = { unit: '%', value: 100 };
-    stackLayout.style.width = { unit: '%', value: 100 };
+    sl.addEventListener('tap', (evt) => {
+      console.log(
+        `Tapped the orange AbsoluteLayout. target: ${evt.target} currentTarget: ${evt.currentTarget}`
+      );
+    });
+    const slv = sl.view;
+    slv.backgroundColor = 'yellow';
+    slv.style.height = { unit: '%', value: 100 };
+    slv.style.width = { unit: '%', value: 100 };
 
-    const absoluteLayoutWrapper = document.createElement(
+    const al = document.createElement(
       'absolute-layout'
     ) as NHTMLElement<AbsoluteLayout>;
-    const absoluteLayout = absoluteLayoutWrapper.view;
-    absoluteLayout.backgroundColor = 'orange';
-    absoluteLayout.style.height = { unit: 'dip', value: 200 };
-    absoluteLayout.style.width = { unit: 'dip', value: 200 };
+    al.addEventListener('tap', (evt) => {
+      console.log(
+        `Tapped the orange AbsoluteLayout. target: ${evt.target} currentTarget: ${evt.currentTarget}`
+      );
+    });
+    const alv = al.view;
+    alv.backgroundColor = 'orange';
+    alv.style.height = { unit: 'dip', value: 200 };
+    alv.style.width = { unit: 'dip', value: 200 };
 
-    stackLayoutWrapper.appendChild(absoluteLayoutWrapper);
+    sl.appendChild(al);
 
-    return stackLayout;
+    return sl.view;
   },
 });
 
