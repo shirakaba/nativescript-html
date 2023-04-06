@@ -17,7 +17,9 @@ import { Writable } from './typeHelpers';
  *
  * This is intended to replace happy-dom's EventTarget implementation.
  */
-export class NEventTarget<N extends View = View> implements EventTarget {
+export default class NEventTarget<N extends View = View>
+  implements EventTarget
+{
   /**
    * A view (initialised externally) or null (for viewless NEventTargets).
    */
@@ -36,7 +38,7 @@ export class NEventTarget<N extends View = View> implements EventTarget {
   private _gesturesMap: Map<EventListener, GesturesObserver> | undefined;
   private _getGesturesMap(): Map<EventListener, GesturesObserver> {
     if (!this._gesturesMap) {
-      Object.defineProperty(this, 'gesturesMap', {
+      Object.defineProperty(this, '_gesturesMap', {
         value: new Map<EventListener, GesturesObserver>(),
       });
     }
@@ -71,6 +73,7 @@ export class NEventTarget<N extends View = View> implements EventTarget {
     callback: EventListenerOrEventListenerObject | null,
     options?: AddEventListenerOptions | boolean
   ): void {
+    console.log(`${this.constructor.name}.addEventListener('${type}') !`);
     if (!callback) {
       return;
     }
@@ -445,7 +448,9 @@ function _disconnectGestureObserversPatched<N extends View>(
   observerPrivate._context = null;
 }
 
-export function patchObservable(): void {
+export function patch(globalThis: any): void {
+  globalThis.EventTarget = NEventTarget;
+
   // We patch notify() to re-fire all non-user NativeScript events as DOM
   // Events.
   //

@@ -11,8 +11,8 @@ import {
   Observable,
 } from '@nativescript/core';
 
-import { patchEvent } from './Event';
-import { Dispatcher, patchObservable } from './EventTarget';
+import { patch as patchEvent } from './Event';
+import { Dispatcher, patch as patchEventTarget } from './EventTarget';
 
 /**
  * Our base HTMLElement implementation for any NativeScript UI elements.
@@ -88,9 +88,9 @@ export abstract class DOMLayoutBase<
   // ChildNode.before() also use existing methods under-the-hood.
 }
 
-export function registerCustomElements(): void {
+export function registerCustomElements(globalThis: any): void {
   patchEvent();
-  patchObservable();
+  patchEventTarget(globalThis);
 
   // TODO: maybe move these into patchEventTarget() or similar?
 
@@ -103,6 +103,15 @@ export function registerCustomElements(): void {
   ): void {
     console.log(`${this.constructor.name}.on('${eventNames}')`);
     on.call(this, eventNames, callback, thisArg);
+  };
+  const addEventListener = Observable.prototype.addEventListener;
+  Observable.prototype.addEventListener = function (
+    eventNames: string,
+    callback: (data: EventData) => void,
+    thisArg?: any
+  ): void {
+    console.log(`${this.constructor.name}.addEventListener('${eventNames}')`);
+    addEventListener.call(this, eventNames, callback, thisArg);
   };
 
   // Give the view a way to directly call the dispatchEvent() method of its DOM

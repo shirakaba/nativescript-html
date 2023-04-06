@@ -64,6 +64,10 @@ module.exports = (env) => {
         require.resolve('happy-dom/lib/fetch/ResourceFetchHandler'),
         'nativescript-dom/lib/ResourceFetchHandler.js'
       )
+      .set(
+        require.resolve('happy-dom/lib/event/EventTarget'),
+        'nativescript-dom/dist/EventTarget.js'
+      )
       .set('node-fetch', 'nativescript-dom/lib/NodeFetch.js')
       .set('perf_hooks', 'nativescript-dom/lib/Performance.js')
       .set('vm', 'nativescript-dom/lib/VM.js');
