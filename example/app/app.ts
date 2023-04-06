@@ -12,7 +12,7 @@ Application.run({
     ) as NHTMLElement<StackLayout>;
     sl.addEventListener('tap', (evt) => {
       console.log(
-        `Tapped the orange AbsoluteLayout. target: ${evt.target} currentTarget: ${evt.currentTarget}`
+        `Tapped the yellow StackLayout. target: ${evt.target} currentTarget: ${evt.currentTarget}`
       );
     });
     const slv = sl.view;

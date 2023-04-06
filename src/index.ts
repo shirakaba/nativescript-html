@@ -6,6 +6,6 @@ import { registerCustomElements } from './customElements';
 GlobalRegistrator.register();
 
 // Register all the HTML Custom Elements (wrappers around NativeScript views).
-registerCustomElements(global);
+registerCustomElements();
 
 export { NHTMLElement, DOMLayoutBase } from './customElements';

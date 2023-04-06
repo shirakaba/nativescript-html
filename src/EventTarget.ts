@@ -443,8 +443,15 @@ function _disconnectGestureObserversPatched<N extends View>(
   observerPrivate._context = null;
 }
 
-export function patch(globalThis: any): void {
-  globalThis.EventTarget = NEventTarget;
+export function patch(): void {
+  // happy-dom overrides dispatchEvent() on Node rather than just implementing
+  // it on EventTarget (and to be fair, that's a cleaner approach). But as we've
+  // been quite lazy and defined a Node-aware EventTarget, we'll want to delete
+  // this override to make sure it uses our EventTarget implementation.
+  //
+  // @ts-ignore Removal of this non-optional method is safe because the
+  // superclass provides it.
+  delete Node.prototype.dispatchEvent;
 
   // We patch notify() to re-fire all non-user NativeScript events as DOM
   // Events.
