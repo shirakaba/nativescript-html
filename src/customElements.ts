@@ -18,6 +18,8 @@ import {
 } from '@nativescript/core/ui/gestures';
 import { Optional } from '@nativescript/core/utils/typescript-utils';
 
+import { Writable } from './typeHelpers';
+
 export abstract class NHTMLElement<N extends View = View> extends HTMLElement {
   abstract readonly view: N;
 
@@ -60,6 +62,7 @@ export abstract class NHTMLElement<N extends View = View> extends HTMLElement {
       capture: typeof options === 'object' ? !!options.capture : false,
       passive: typeof options === 'object' ? !!options.passive : false,
       signal: typeof options === 'object' ? options.signal : undefined,
+      removed: false,
     });
 
     // Gestures are special-cased and so have their own separate event list.
@@ -115,7 +118,9 @@ export abstract class NHTMLElement<N extends View = View> extends HTMLElement {
       return;
     }
 
-    list.splice(index, 1);
+    const [listenerEntry] = list.splice(index, 1);
+    listenerEntry.removed = true;
+
     if (list.length === 0) {
       delete (this.view as unknown as ViewPrivate)._observers[type];
     }
@@ -140,11 +145,167 @@ export abstract class NHTMLElement<N extends View = View> extends HTMLElement {
   // corresponding listeners. We should reimplement dispatchEvent to do all of
   // that.
   //
-  // dispatchEvent(event: Event): boolean {
-  //   this.view.notify({ eventName: event.type, object: this.view });
+  dispatchEvent(event: Event): boolean {
+    if (event.eventPhase !== Event.NONE) {
+      throw new Error('Tried to dispatch a dispatching event');
+    }
 
-  //   return true;
-  // }
+    // We're the user agent, so we need write privileges, unlike userland code.
+    const nevent = event as Writable<NEvent>;
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const target = this;
+
+    nevent.eventPhase = Event.CAPTURING_PHASE;
+    nevent.target = target;
+    nevent.defaultPrevented = false;
+
+    // happy-dom's composedPath() infinite loops if the event is non-bubbling!
+    const eventPath = this.getEventPath(event, 'capture');
+
+    // Event names in NativeScript are case-sensitive, so don't lowercase them
+    const level0Event = this[`on${event.type}` as keyof this];
+    if (typeof level0Event === 'function') {
+      level0Event.call(this, event);
+    }
+
+    // Capturing phase, e.g. [Page, StackLayout, Button]
+    for (let i = 0; i < eventPath.length; i++) {
+      const currentTarget = eventPath[i];
+      nevent.currentTarget = currentTarget;
+      nevent.eventPhase =
+        nevent.target === nevent.currentTarget
+          ? Event.AT_TARGET
+          : Event.CAPTURING_PHASE;
+
+      this.handleEvent(nevent, Event.CAPTURING_PHASE);
+
+      if (nevent.propagationState !== EventPropagationState.resume) {
+        nevent.resetForRedispatch();
+        return !nevent.defaultPrevented;
+      }
+    }
+
+    // Bubbling phase, e.g. [Button, StackLayout, Page]
+    // It's correct to dispatch the event to the target during both phases.
+    for (let i = eventPath.length - 1; i >= 0; i--) {
+      const currentTarget = eventPath[i];
+      nevent.currentTarget = currentTarget;
+      nevent.eventPhase =
+        nevent.target === nevent.currentTarget
+          ? Event.AT_TARGET
+          : Event.BUBBLING_PHASE;
+
+      this.handleEvent(nevent, Event.BUBBLING_PHASE);
+
+      if (nevent.propagationState !== EventPropagationState.resume) {
+        nevent.resetForRedispatch();
+        return !nevent.defaultPrevented;
+      }
+
+      // If the event doesn't bubble, then, having dispatched it at the
+      // target (the first iteration of this loop) we don't let it
+      // propagate any further.
+      if (!nevent.bubbles) {
+        nevent.resetForRedispatch();
+        break;
+      }
+
+      // Restore event phase in case it changed to AT_TARGET during
+      // nevent.handleEvent().
+      nevent.eventPhase = Event.BUBBLING_PHASE;
+    }
+
+    nevent.resetForRedispatch();
+    return !nevent.defaultPrevented;
+  }
+
+  private handleEvent(event: Writable<NEvent>, phase: 0 | 1 | 2 | 3): void {
+    if (event.currentTarget instanceof NHTMLElement) {
+      // Take a snapshot of the current listeners.
+      const listeners =
+        (event.currentTarget.view as unknown as ViewPrivate)
+          ._getEventList(event.type, false)
+          ?.slice() || emptyArray;
+
+      for (let i = listeners.length - 1; i >= 0; i--) {
+        const listener = listeners[i];
+
+        // The event listener may have been removed since we took a copy of
+        // the array, so bail out if so.
+        if (listener.removed) {
+          continue;
+        }
+
+        const capture = listener.capture;
+
+        // Handle only the events appropriate to the phase.
+        if (
+          (phase === Event.CAPTURING_PHASE && !capture) ||
+          (phase === Event.BUBBLING_PHASE && capture)
+        ) {
+          continue;
+        }
+
+        const callback = listener.callback;
+
+        if (listener.once) {
+          event.currentTarget.removeEventListener(
+            event.type,
+            callback,
+            capture
+          );
+        }
+
+        callback.call(event.currentTarget, event);
+
+        if (listener.passive && event.defaultPrevented) {
+          console.warn(
+            'Unexpected call to event.preventDefault() in passive event listener.'
+          );
+        }
+
+        if (event.propagationState === EventPropagationState.stopImmediate) {
+          break;
+        }
+      }
+    } else {
+      // TODO
+    }
+  }
+
+  /**
+   * Returns the event path.
+   *
+   * - 'capture' paths are ordered from root to target.
+   * - 'bubble' paths are ordered from target to root.
+   * @example
+   * [Page, StackLayout, Button] // 'capture'
+   * @example
+   * [Button, StackLayout, Page] // 'bubble'
+   */
+  private getEventPath(
+    event: Event,
+    path: 'capture' | 'bubble'
+  ): EventTarget[] {
+    const eventPath: EventTarget[] = [];
+    const insert =
+      path === 'capture'
+        ? eventPath.unshift.bind(eventPath)
+        : eventPath.push.bind(eventPath);
+
+    let eventTarget: EventTarget | null | undefined = event.target;
+    while (eventTarget) {
+      insert(eventTarget);
+      if (event.composed && (event.target as ShadowRoot)?.host) {
+        eventTarget = (event.target as ShadowRoot).host;
+      } else if ((event.target as Node)?.ownerDocument === eventTarget) {
+        eventTarget = (event.target as Node)?.ownerDocument?.defaultView;
+      } else {
+        eventTarget = (eventTarget as Node)?.parentNode;
+      }
+    }
+    return eventPath;
+  }
 
   // END EventTarget
 
@@ -157,6 +318,19 @@ export abstract class NHTMLElement<N extends View = View> extends HTMLElement {
 
   // Generally, it's the Node methods that will need reimplementing.
   // The Element methods for attribute-setting will be relatively constant.
+}
+
+/**
+ * Purely a performance utility. We fall back to an empty array on various
+ * optional accesses, so reusing the same one and treating it as immutable
+ * avoids unnecessary allocations on a relatively hot path of the library.
+ */
+const emptyArray: readonly ListenerEntry[] = [];
+
+enum EventPropagationState {
+  resume,
+  stop,
+  stopImmediate,
 }
 
 function usesCapture(options?: AddEventListenerOptions | boolean): boolean {
@@ -207,6 +381,11 @@ interface ListenerEntry extends AddEventListenerOptions {
    * event listeners, just like in DOM.
    */
   thisArg: any;
+  /**
+   * A performance optimisation - allows us to continue using an out-of-date
+   * array of listeners without recreating the array.
+   */
+  removed?: boolean;
 }
 
 /**
@@ -305,7 +484,31 @@ export abstract class DOMLayoutBase<
 type Dispatcher<T extends Observable = Observable> = T &
   Pick<EventTarget, 'dispatchEvent'>;
 
+// type NEvent = Writable<Event & { propagationState: EventPropagationState }>;
+
+declare class NEvent extends Event {
+  propagationState: EventPropagationState;
+  resetForRedispatch(): void;
+}
+
 export function registerCustomElements(): void {
+  Object.defineProperty(Event.prototype, 'propagationState', {
+    value: EventPropagationState.resume,
+    writable: true,
+    enumerable: false,
+  });
+  Object.defineProperty(Event.prototype, 'resetForRedispatch', {
+    value: function (this: Writable<NEvent>): void {
+      console.log('Sanity check: `this` should be the Event.', this);
+      this.currentTarget = null;
+      this.target = null;
+      this.eventPhase = Event.NONE;
+      this.propagationState = EventPropagationState.resume;
+    },
+    writable: false,
+    enumerable: false,
+  });
+
   const on = Observable.prototype.on;
   Observable.prototype.on = function (
     eventNames: string,
