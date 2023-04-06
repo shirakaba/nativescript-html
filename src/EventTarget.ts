@@ -185,11 +185,6 @@ export default class NEventTarget<N extends View = View>
     }
   }
 
-  // FIXME: happy-dom's EventTarget.dispatchEvent checks
-  // `this._listeners[event.type]`, intending to call handleEvent on any
-  // corresponding listeners. We should reimplement dispatchEvent to do all of
-  // that.
-  //
   dispatchEvent(event: Event): boolean {
     if (event.eventPhase !== Event.NONE) {
       throw new Error('Tried to dispatch a dispatching event');

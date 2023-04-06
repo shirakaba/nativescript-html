@@ -4,13 +4,15 @@ export enum EventPropagationState {
   stopImmediate,
 }
 
-/**
- * Add our internal state helpers to happy-dom's Event
- */
-export function patch(): void {}
-
 const timeOrigin = Date.now();
 
+/**
+ * An Event implementation that is more spec-accurate than happy-dom's (and
+ * doesn't infinite-loop on event.composedPath() when `this.bubbles` is false!).
+ * It's carefully optimised, too. Note that it has no coupling to NativeScript.
+ *
+ * This is intended to replace happy-dom's Event implementation.
+ */
 export default class NEvent implements Event {
   // Assigning properties directly to the prototype where possible avoids
   // wasted work in the constructor on each instance construction.
@@ -76,14 +78,14 @@ export default class NEvent implements Event {
    * operation during which event was dispatched, can be canceled by invoking
    * the preventDefault() method.
    */
-  declare readonly cancelable: boolean;
+  declare cancelable: boolean;
 
   /**
    * Returns true or false depending on how event was initialized. True if event
    * goes through its target's ancestors in reverse tree order, and false
    * otherwise.
    */
-  declare readonly bubbles: boolean;
+  declare bubbles: boolean;
 
   /** @deprecated Setting this value does nothing. */
   declare cancelBubble: boolean;
@@ -153,9 +155,9 @@ export default class NEvent implements Event {
     eventInitDict?: EventInit
   ) {
     // Avoid destructuring the options object (might save some nanoseconds).
-    this.bubbles = eventInitDict?.bubbles ?? false;
-    this.cancelable = eventInitDict?.cancelable ?? false;
-    this.composed = eventInitDict?.composed ?? false;
+    this.bubbles = !!eventInitDict?.bubbles;
+    this.cancelable = !!eventInitDict?.cancelable;
+    this.composed = !!eventInitDict?.composed;
   }
 
   /**
@@ -206,12 +208,10 @@ export default class NEvent implements Event {
   }
 
   /** @deprecated */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   initEvent(type: string, bubbles?: boolean, cancelable?: boolean): void {
-    // This would be trivial to implement, but we'd have to remove the
-    // readonly modifier from `bubbles` and `cancelable`, which would be a
-    // shame just for the sake of supporting a deprecated method.
-    throw new Error('Deprecated; use Event() instead.');
+    this.type = type;
+    this.bubbles = !!bubbles;
+    this.cancelable = !!cancelable;
   }
 
   /**
@@ -243,7 +243,8 @@ export default class NEvent implements Event {
   }
 
   /**
-   * Resets any internal state to allow the event to be redispatched. Call
+   * @private
+   * Internal API to reset all state to allow the event to be redispatched. Call
    * this before returning from EventTarget.handleEvent().
    */
   resetForRedispatch(): void {

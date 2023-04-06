@@ -11,7 +11,6 @@ import {
   Observable,
 } from '@nativescript/core';
 
-import { patch as patchEvent } from './Event';
 import { Dispatcher, patch as patchEventTarget } from './EventTarget';
 
 /**
@@ -89,7 +88,6 @@ export abstract class DOMLayoutBase<
 }
 
 export function registerCustomElements(globalThis: any): void {
-  patchEvent();
   patchEventTarget(globalThis);
 
   // TODO: maybe move these into patchEventTarget() or similar?
