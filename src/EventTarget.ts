@@ -7,7 +7,7 @@ import {
 } from '@nativescript/core/ui/gestures';
 import { Optional } from '@nativescript/core/utils/typescript-utils';
 
-import { NEvent } from './Event';
+import type { default as NEvent } from './Event';
 import { Writable } from './typeHelpers';
 
 /**
@@ -205,7 +205,7 @@ export default class NEventTarget<N extends View = View>
     nevent.defaultPrevented = false;
 
     // happy-dom's composedPath() infinite loops if the event is non-bubbling!
-    const eventPath = this.getEventPath(event, 'capture');
+    const eventPath = this.getEventPath(nevent, 'capture');
 
     // Event names in NativeScript are case-sensitive, so don't lowercase them
     const level0Event = this[`on${event.type}` as keyof this];

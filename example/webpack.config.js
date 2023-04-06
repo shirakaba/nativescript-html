@@ -65,6 +65,10 @@ module.exports = (env) => {
         'nativescript-dom/lib/ResourceFetchHandler.js'
       )
       .set(
+        require.resolve('happy-dom/lib/event/Event'),
+        'nativescript-dom/dist/Event.js'
+      )
+      .set(
         require.resolve('happy-dom/lib/event/EventTarget'),
         'nativescript-dom/dist/EventTarget.js'
       )
