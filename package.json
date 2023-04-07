@@ -29,9 +29,11 @@
     "set-value": "^4.1.0"
   },
   "peerDependencies": {
+    "@nativescript-community/gesturehandler": "*",
     "@nativescript/core": "*"
   },
   "devDependencies": {
+    "@nativescript-community/gesturehandler": "^2.0.9",
     "@nativescript/core": "^8.5.0",
     "@nativescript/ios": "8.4.1",
     "@types/set-value": "^4.0.1",

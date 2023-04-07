@@ -3,7 +3,12 @@ import {
   type StackLayout,
   type AbsoluteLayout,
 } from '@nativescript/core';
-import type { NHTMLElement } from 'nativescript-dom';
+import { GestureRootView } from '@nativescript-community/gesturehandler';
+import {
+  DOMLayoutBase,
+  NHTMLElement,
+  setDispatchEvent,
+} from 'nativescript-dom';
 
 Application.run({
   create: () => {
@@ -46,7 +51,20 @@ Application.run({
 
     sl.appendChild(al);
 
-    return sl.view;
+    customElements.define('gesture-root-view', GRV);
+    const grv = document.createElement(
+      'gesture-root-view'
+    ) as NHTMLElement<GestureRootView>;
+
+    grv.appendChild(sl);
+
+    grv.addEventListener('tap', (evt) => {
+      console.log(
+        `Tapped the GestureRootView. target: ${evt.target} currentTarget: ${evt.currentTarget}`
+      );
+    });
+
+    return grv.view;
   },
 });
 
@@ -54,3 +72,13 @@ Application.run({
 Do not place any code after the application has been started as it will not
 be executed on iOS.
 */
+class GRV extends DOMLayoutBase<GestureRootView> {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  readonly view = new (require('@nativescript-community/gesturehandler')
+    .GestureRootView as typeof GestureRootView)();
+
+  constructor() {
+    super();
+    setDispatchEvent(this);
+  }
+}

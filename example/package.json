@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
+    "@nativescript-community/gesturehandler": "^2.0.9",
     "@nativescript/core": "^8.5.0",
     "@nativescript/theme": "~3.0.2",
     "nativescript-dom": "file:..",

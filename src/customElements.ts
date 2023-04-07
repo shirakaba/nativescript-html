@@ -112,13 +112,6 @@ export function registerCustomElements(): void {
     addEventListener.call(this, eventNames, callback, thisArg);
   };
 
-  // Give the view a way to directly call the dispatchEvent() method of its DOM
-  // container.
-  const setDispatchEvent = <T extends View>(domElement: NHTMLElement<T>) => {
-    (domElement.view as Dispatcher<T>).dispatchEvent = (event: Event) =>
-      domElement.dispatchEvent(event);
-  };
-
   /* eslint-disable @typescript-eslint/no-var-requires */
   class DOMAbsoluteLayout extends DOMLayoutBase<AbsoluteLayout> {
     // FIXME: this fires the 'created' event before we've set dispatchEvent upon
@@ -185,4 +178,13 @@ export function registerCustomElements(): void {
     }
   }
   customElements.define('wrap-layout', DOMWrapLayout);
+}
+
+// Give the view a way to directly call the dispatchEvent() method of its DOM
+// container.
+export function setDispatchEvent<T extends View>(
+  domElement: NHTMLElement<T>
+): void {
+  (domElement.view as Dispatcher<T>).dispatchEvent = (event: Event) =>
+    domElement.dispatchEvent(event);
 }

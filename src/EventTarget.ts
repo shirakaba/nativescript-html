@@ -6,6 +6,7 @@ import {
   fromString as gestureFromString,
 } from '@nativescript/core/ui/gestures';
 import { Optional } from '@nativescript/core/utils/typescript-utils';
+import { HandlerType, Manager } from '@nativescript-community/gesturehandler';
 
 import type { default as NEvent } from './Event';
 import { Writable } from './typeHelpers';
@@ -133,6 +134,12 @@ export default class NEventTarget<N extends View = View>
       // Keep a record of the gesture observer so that we can remove it later in
       // removeEventListener().
       this._getGesturesMap().set(callback, ourObserver);
+
+      // const manager = Manager.getInstance();
+      // const gestureHandler = manager.createGestureHandler(HandlerType.TAP, 10, {
+      //   numberOfTaps: 1,
+      // });
+      // gestureHandler.attachToView(this.view);
     }
   }
 
@@ -434,6 +441,13 @@ function _disconnectGestureObserversPatched<N extends View>(
 
   // Do the same cleanup up as in GesturesObserver.disconnect().
 
+  // 🚨 GestureHandler implements its own GesturesObserver that it forces View
+  // to use for everything except the "touch" event. For an easy life, I think
+  // we'll just ignore "touch" events, but if we do end up supporting them,
+  // we'll need to remember to disconnect `nObserver` (a legacy GesturesObserver
+  // from Core).
+  // https://github.com/nativescript-community/gesturehandler/blob/a7577f01ed00a4bc1959449d76b63d02b48c0015/src/gesturehandler/gestures_override.ts#L60
+
   observerPrivate._detach();
 
   view.off('loaded', observerPrivate._onTargetLoaded!);
@@ -484,7 +498,13 @@ export function patch(): void {
       // It's a View that we've wrapped
       (this as Dispatcher).dispatchEvent(event);
     } else {
-      console.log(`calling window.dispatchEvent('${eventName}')...`);
+      if (eventName === 'GestureHandlerStateEvent') {
+        console.trace(
+          `calling window.dispatchEvent('${eventName}') with data.object.native ${
+            data.object.constructor.name
+          } and data.view ${(data as any).view}`
+        );
+      }
       // Either we haven't wrapped the view yet (e.g. the "created" event was
       // fired during the View's constructor) or it's some view that wasn't made
       // in userland (e.g. the accessibility singleton).
