@@ -112,7 +112,11 @@ export default class NEventTarget<N extends View = View>
     if (gesture && this.view) {
       const gestureCallback = (args: GestureEventData) => {
         const { eventName, ...rest } = args;
-        const event = new CustomEvent(eventName, { detail: { ...rest } });
+        const event = new CustomEvent(eventName, {
+          bubbles: true,
+          cancelable: true,
+          detail: { ...rest },
+        });
         this.dispatchEvent(event);
       };
 

@@ -7,12 +7,23 @@ import type { NHTMLElement } from 'nativescript-dom';
 
 Application.run({
   create: () => {
+    // This is largely working, but:
+    // 1 - gestures in NativeScript iOS seem to fire first on the parent, and
+    //     then on the child (confirmed in Playground).
+    // 2 - Apple docs suggest that gestures should in fact fire first on the
+    //     child, as they do in the browser.
+    // 3 - I am seeing three lines printed for one click on the inner view. This
+    //     is because the native gesture handlers fire:
+    //     1. outer view (triggering just the outer tap handler);
+    //     2. inner view (triggering inner, then bubbling to outer).
+    // 4 - buttons will swallow the gesture (but this is fine as we will re-emit
+    //     it via DOM)
     const sl = document.createElement(
       'stack-layout'
     ) as NHTMLElement<StackLayout>;
     sl.addEventListener('tap', (evt) => {
       console.log(
-        `Tapped the yellow StackLayout. target: ${evt.target} currentTarget: ${evt.currentTarget}`
+        `Tapped the yellow (outer) StackLayout. target: ${evt.target} currentTarget: ${evt.currentTarget}`
       );
     });
     const slv = sl.view;
@@ -25,7 +36,7 @@ Application.run({
     ) as NHTMLElement<AbsoluteLayout>;
     al.addEventListener('tap', (evt) => {
       console.log(
-        `Tapped the orange AbsoluteLayout. target: ${evt.target} currentTarget: ${evt.currentTarget}`
+        `Tapped the orange (inner) AbsoluteLayout. target: ${evt.target} currentTarget: ${evt.currentTarget}`
       );
     });
     const alv = al.view;
