@@ -448,7 +448,13 @@ function _disconnectGestureObserversPatched<N extends View>(
   observerPrivate._context = null;
 }
 
+let patched = false;
 export function patch(): void {
+  if (patched) {
+    return;
+  }
+  patched = true;
+
   // happy-dom overrides dispatchEvent() on Node rather than just implementing
   // it on EventTarget (and to be fair, that's a cleaner approach). But as we've
   // been quite lazy and defined a Node-aware EventTarget, we'll want to delete
