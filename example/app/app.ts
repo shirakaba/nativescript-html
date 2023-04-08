@@ -21,10 +21,8 @@ Application.run({
     const sl = document.createElement(
       'stack-layout'
     ) as NHTMLElement<StackLayout>;
-    sl.addEventListener('tap', (evt) => {
-      console.log(
-        `Tapped the yellow (outer) StackLayout. target: ${evt.target} currentTarget: ${evt.currentTarget}`
-      );
+    sl.addEventListener('tap', (evt: Event) => {
+      console.log('Tapped the yellow (outer) StackLayout.');
     });
     const slv = sl.view;
     slv.backgroundColor = 'yellow';
@@ -34,10 +32,8 @@ Application.run({
     const al = document.createElement(
       'absolute-layout'
     ) as NHTMLElement<AbsoluteLayout>;
-    al.addEventListener('tap', (evt) => {
-      console.log(
-        `Tapped the orange (inner) AbsoluteLayout. target: ${evt.target} currentTarget: ${evt.currentTarget}`
-      );
+    al.addEventListener('tap', (evt: Event) => {
+      console.log('Tapped the orange (inner) AbsoluteLayout.');
     });
     const alv = al.view;
     alv.backgroundColor = 'orange';

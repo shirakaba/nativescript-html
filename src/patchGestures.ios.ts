@@ -18,6 +18,7 @@ interface UIResponder {
 }
 
 declare class UIGestureRecognizer {
+  description: string;
   view: UIResponder;
 }
 
@@ -51,26 +52,38 @@ const _UIGestureRecognizerDelegateImpl = NSObject.extend(
       gestureRecognizer: UIGestureRecognizer,
       otherGestureRecognizer: UIGestureRecognizer
     ): boolean {
-      // When handling recognizers for the same gesture on the same view, let
-      // just one of the recognizers respond.
-      if (otherGestureRecognizer.view === gestureRecognizer.view) {
-        // TODO: deterministically choose one of the two somehow.
-      }
-
-      // If common gesture recognizers are in the same responder chain, let the
-      // most nested one succeed.
-      if (
-        isInResponderChain(otherGestureRecognizer.view, gestureRecognizer.view)
-      ) {
-        return true;
-      }
-
-      // If both gesture recognizers are of type UITapGestureRecognizer & one of them is a doubleTap,
-      // we must require a failure.
+      // If both gesture recognizers are of type UITapGestureRecognizer & one of
+      // them is a doubleTap, we must require a failure.
       if (
         gestureRecognizer instanceof UITapGestureRecognizer &&
         otherGestureRecognizer instanceof UITapGestureRecognizer &&
         otherGestureRecognizer.numberOfTapsRequired === 2
+      ) {
+        return true;
+      }
+
+      // I'm not too sure about this, so leaving it as a note.
+      //
+      // // When handling recognizers for the same gesture on the same view, let
+      // // just one of the recognizers respond (i.e. defer to addEventListener's
+      // // ability to accept multiple event listeners for the same event name).
+      // if (
+      //   gestureRecognizer.view === otherGestureRecognizer.view &&
+      //   gestureRecognizer.constructor.name ===
+      //     otherGestureRecognizer.constructor.name
+      // ) {
+      //   // We pick one of the two arbitrarily but deterministically.
+      //   return (
+      //     gestureRecognizer.description > otherGestureRecognizer.description
+      //   );
+      // }
+
+      // If common gesture recognizers are in the same responder chain, let the
+      // most nested one succeed (i.e. defer to DOM bubbling).
+      // TODO: decide how to handle recognizers in the same responder chain with
+      // respect to their type (should only identical-type ones be suppressed?).
+      if (
+        isInResponderChain(otherGestureRecognizer.view, gestureRecognizer.view)
       ) {
         return true;
       }
