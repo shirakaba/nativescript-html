@@ -1,4 +1,4 @@
-import { type View, Observable, EventData } from '@nativescript/core';
+import { type View, Observable, EventData, isIOS } from '@nativescript/core';
 import {
   GestureEventData,
   GestureTypes,
@@ -383,6 +383,28 @@ declare class GesturesObserverPrivate {
   _onTargetLoaded: null | ((data: EventData) => void);
   _onTargetUnloaded: null | ((data: EventData) => void);
   _target: View | null;
+
+  // iOS-only internal API that happens to be our only (roundabout) entrypoint
+  // by which to patch UIGestureRecognizerDelegateImpl which is fileprivate.
+  _createRecognizer(
+    type: GestureTypes,
+    callback?: (args: GestureEventData) => void,
+    swipeDirection?: unknown
+  ): {
+    delegate?: UIGestureRecognizerDelegateImpl;
+  };
+}
+
+declare class UIGestureRecognizerDelegateImpl {
+  /**
+   * Returns an instance of the class. Not sure how to write it without
+   * TypeScript complaining.
+   */
+  static new(): unknown;
+  gestureRecognizerShouldRequireFailureOfGestureRecognizer(
+    gestureRecognizer: UIGestureRecognizer,
+    otherGestureRecognizer: UIGestureRecognizer
+  ): boolean;
 }
 
 declare class ViewPrivate extends ObservablePrivate {
@@ -447,6 +469,8 @@ function _disconnectGestureObserversPatched<N extends View>(
   observerPrivate._context = null;
 }
 
+let hasPatchedUIGestureRecognizerDelegateImpl = false;
+
 export function patch(): void {
   // happy-dom overrides dispatchEvent() on Node rather than just implementing
   // it on EventTarget (and to be fair, that's a cleaner approach). But as we've
@@ -456,6 +480,10 @@ export function patch(): void {
   // @ts-ignore Removal of this non-optional method is safe because the
   // superclass provides it.
   delete Node.prototype.dispatchEvent;
+
+  if (isIOS) {
+    patchiOSGestures();
+  }
 
   // We patch notify() to re-fire all non-user NativeScript events as DOM
   // Events.
@@ -491,6 +519,119 @@ export function patch(): void {
       window.dispatchEvent(event);
     }
   };
+}
+
+/**
+ * @platform iOS
+ */
+let patchedRecognizerDelegateInstance: UIGestureRecognizerDelegateImpl | null =
+  null;
+
+/**
+ * We patch UIGestureRecognizerDelegateImpl to cancel gesture recognition when
+ * appropriate to ensure that only the most nested gesture recogniser fires.
+ */
+function patchiOSGestures(): void {
+  const gop = GesturesObserver as unknown as typeof GesturesObserverPrivate;
+  const _createRecognizer = gop.prototype._createRecognizer;
+
+  // UIGestureRecognizerDelegateImpl is fileprivate so we run the patch by
+  // hooking into the _createRecognizer, which gives us an indirect way to get
+  // at the delegate to alter it.
+  gop.prototype._createRecognizer = function (type, callback, swipeDirection) {
+    const recognizer = _createRecognizer.call(
+      this,
+      type,
+      callback,
+      swipeDirection
+    );
+
+    const delegate = recognizer.delegate;
+    if (hasPatchedUIGestureRecognizerDelegateImpl || !delegate) {
+      return recognizer;
+    }
+
+    hasPatchedUIGestureRecognizerDelegateImpl = true;
+
+    const _UIGestureRecognizerDelegateImpl =
+      delegate.constructor as unknown as typeof UIGestureRecognizerDelegateImpl;
+
+    const gestureRecognizerShouldRequireFailureOfGestureRecognizer =
+      _UIGestureRecognizerDelegateImpl.prototype
+        .gestureRecognizerShouldRequireFailureOfGestureRecognizer;
+    console.log(
+      'installing patch! before:',
+      gestureRecognizerShouldRequireFailureOfGestureRecognizer.toString()
+    );
+    _UIGestureRecognizerDelegateImpl.prototype.gestureRecognizerShouldRequireFailureOfGestureRecognizer =
+      function (
+        gestureRecognizer: UIGestureRecognizer,
+        otherGestureRecognizer: UIGestureRecognizer
+      ) {
+        console.log('running patched impl!');
+        if (
+          // TODO: and also same type of gesture
+          isInResponderChain(
+            otherGestureRecognizer.view,
+            gestureRecognizer.view
+          )
+        ) {
+          console.log('patch working!');
+          return true;
+        }
+
+        return gestureRecognizerShouldRequireFailureOfGestureRecognizer.call(
+          this,
+          gestureRecognizer,
+          otherGestureRecognizer
+        );
+      };
+
+    console.log(
+      'installed patch! after:',
+      _UIGestureRecognizerDelegateImpl.prototype.gestureRecognizerShouldRequireFailureOfGestureRecognizer.toString()
+    );
+
+    patchedRecognizerDelegateInstance =
+      _UIGestureRecognizerDelegateImpl.new() as UIGestureRecognizerDelegateImpl;
+
+    recognizer.delegate = patchedRecognizerDelegateInstance;
+    console.log('replaced delegate!');
+
+    return recognizer;
+  };
+
+  /**
+   * Checks whether `targetResponder` is found in the responder chain of
+   * `responder`.
+   * @example
+   *   // A parent will typically be present in the responder chain of a child:
+   *   isInResponderChain(child, parent); // true
+   *   // A child won't typically be present in the responder chain of a parent:
+   *   isInResponderChain(parent, child); // false
+   */
+  function isInResponderChain(
+    responder: UIResponder,
+    targetResponder: UIResponder
+  ): boolean {
+    let nextResponder = responder.nextResponder;
+    while (nextResponder) {
+      if (nextResponder === targetResponder) {
+        return true;
+      }
+
+      nextResponder = nextResponder.nextResponder;
+    }
+    return false;
+  }
+}
+
+interface UIResponder {
+  nextResponder: UIResponder | null;
+}
+
+declare class UIGestureRecognizer {
+  view: UIResponder;
 }
 
 /**
