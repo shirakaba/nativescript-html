@@ -23,18 +23,15 @@ export abstract class NHTMLElement<N extends View = View> extends HTMLElement {
   // event that's useless in the first place.
   abstract readonly view: N;
 
-  // TODO: style.
-  //
-  // See CSSStyleDeclaration. It stores an Attr under this._attributes.style.
-  // It's fine for reading out the full CSS string, but inefficient for
-  // individual style setting (it's an array of declarations on the inside).
-  //
-  // Need to decide how much of NativeScript's CSS vs. happy-dom's to use. As
-  // happy-dom is headless, it may not be great to rely upon.
-  //
-  // Probably easiest to refer to what other flavours have done (defer to
-  // NativeScript), but hard to know how much of happy-dom I'll need to cut out
-  // to do that correctly.
+  // happy-dom does implement CSS but it's easiest just to use what NativeScript
+  // gives us.
+  get style(): CSSStyleDeclaration {
+    return this.view.style as unknown as CSSStyleDeclaration;
+  }
+
+  set style(inlineStyle: CSSStyleDeclaration /* | string */) {
+    this.view.setInlineStyle(inlineStyle as unknown as string);
+  }
 
   // TODO: Element interface
   // TODO: ElementCSSInlineStyle interface (for HTMLElement and SVGElement)

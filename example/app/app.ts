@@ -7,19 +7,21 @@ Application.run({
     sl.addEventListener('tap', (evt: Event) => {
       console.log('Tapped the yellow (outer) StackLayout.');
     });
-    const slv = sl.view;
-    slv.backgroundColor = 'yellow';
-    slv.style.height = { unit: '%', value: 100 };
-    slv.style.width = { unit: '%', value: 100 };
+    sl.style.backgroundColor = 'yellow';
+    sl.style.height = '100%';
+    sl.style.width = '100%';
 
     const al = document.createElement('absolute-layout');
     al.addEventListener('tap', (evt: Event) => {
       console.log('Tapped the orange (inner) AbsoluteLayout.');
     });
-    const alv = al.view;
-    alv.backgroundColor = 'orange';
-    alv.style.height = { unit: 'dip', value: 200 };
-    alv.style.width = { unit: 'dip', value: 200 };
+    al.style.backgroundColor = 'orange';
+    al.style.height = '200px';
+    al.style.width = '200px';
+    // const alv = al.view;
+    // alv.backgroundColor = 'orange';
+    // alv.style.height = { unit: 'dip', value: 200 };
+    // alv.style.width = { unit: 'dip', value: 200 };
 
     sl.appendChild(al);
 
