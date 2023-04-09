@@ -9,8 +9,8 @@ import {
   HTMLGridLayoutElement,
   HTMLStackLayoutElement,
   HTMLWrapLayoutElement,
-} from './customElements';
-import { patchCreateElement } from './customElements/NHTMLElement';
+} from './elements';
+import { patchCreateElement } from './elements/NHTMLElement';
 
 // Register happy-dom classes like Event, EventTarget on the global namespace.
 GlobalRegistrator.register();
@@ -25,8 +25,8 @@ patchCreateElement(Document);
 registerAllCustomElements();
 
 // Tools for anyone to make their own custom elements.
-export { HTMLLayoutBaseElement } from './customElements/HTMLLayoutBaseElement';
-export { NHTMLElement } from './customElements/NHTMLElement';
+export { HTMLLayoutBaseElement } from './elements/HTMLLayoutBaseElement';
+export { NHTMLElement } from './elements/NHTMLElement';
 
 declare global {
   interface HTMLElementTagNameMap {
