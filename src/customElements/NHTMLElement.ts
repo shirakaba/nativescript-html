@@ -26,11 +26,31 @@ export abstract class NHTMLElement<N extends View = View> extends HTMLElement {
   // happy-dom does implement CSS but it's easiest just to use what NativeScript
   // gives us.
   get style(): CSSStyleDeclaration {
-    return this.view.style as unknown as CSSStyleDeclaration;
+    return new Proxy(this.view.style, {
+      set: (target, p, newValue, receiver) => {
+        return Reflect.set(
+          target,
+          p,
+          // Crudely coerce px to dip to match the web.
+          typeof newValue === 'string'
+            ? newValue.replace('px', 'dip')
+            : newValue,
+          receiver
+        );
+      },
+    }) as unknown as CSSStyleDeclaration;
   }
 
   set style(inlineStyle: CSSStyleDeclaration /* | string */) {
-    this.view.setInlineStyle(inlineStyle as unknown as string);
+    // The view setter will throw an error for us anyway if it's not a string.
+    const maybeString = inlineStyle as unknown as string;
+
+    this.view.setInlineStyle(
+      // Crudely coerce px to dip to match the web.
+      typeof maybeString === 'string'
+        ? maybeString.replace('px', 'dip')
+        : (maybeString as unknown as string)
+    );
   }
 
   // TODO: Element interface
