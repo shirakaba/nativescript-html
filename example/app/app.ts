@@ -1,5 +1,5 @@
 import { Application, TapGestureEventData } from '@nativescript/core';
-import 'nativescript-dom';
+import 'nativescript-html';
 
 Application.run({
   create: () => {

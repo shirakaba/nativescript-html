@@ -1,7 +1,7 @@
 {
-  "name": "nativescript-dom",
+  "name": "nativescript-html",
   "version": "1.0.0",
-  "description": "A best-effort DOM API for NativeScript",
+  "description": "HTML (and various other web platform features) for NativeScript",
   "main": "dist/index.js",
   "files": [
     "dist",
@@ -15,14 +15,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/shirakaba/nativescript-dom.git"
+    "url": "git+https://github.com/shirakaba/nativescript-html.git"
   },
   "author": "Jamie Birch",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/shirakaba/nativescript-dom/issues"
+    "url": "https://github.com/shirakaba/nativescript-html/issues"
   },
-  "homepage": "https://github.com/shirakaba/nativescript-dom#readme",
+  "homepage": "https://github.com/shirakaba/nativescript-html#readme",
   "dependencies": {
     "@happy-dom/global-registrator": "^5.3.1",
     "happy-dom": "^5.2.0",

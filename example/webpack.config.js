@@ -35,7 +35,7 @@ module.exports = (env) => {
     if (!supportFileReader) {
       config.resolve.alias.set(
         require.resolve('happy-dom/lib/file/FileReader'),
-        'nativescript-dom/lib/FileReader.js'
+        'nativescript-html/lib/FileReader.js'
       );
     }
 
@@ -53,28 +53,28 @@ module.exports = (env) => {
         },
       ]);
 
-    config.entry('bundle').prepend('nativescript-dom');
+    config.entry('bundle').prepend('nativescript-html');
 
     // Swap out their ResourceFetchHandler for ours (which uses
     // NativeScript's global fetch() rather than their Node-based one).
     // Responsible for this error (that seems to be inconsequential..?):
-    // > Watchpack Error (initial scan): Error: ENOTDIR: not a directory, scandir '/Users/jamie/Documents/git/nativescript-dom/node_modules/happy-dom/lib/fetch/ResourceFetchHandler.js'
+    // > Watchpack Error (initial scan): Error: ENOTDIR: not a directory, scandir '/Users/jamie/Documents/git/nativescript-html/node_modules/happy-dom/lib/fetch/ResourceFetchHandler.js'
     config.resolve.alias
       .set(
         require.resolve('happy-dom/lib/fetch/ResourceFetchHandler'),
-        'nativescript-dom/lib/ResourceFetchHandler.js'
+        'nativescript-html/lib/ResourceFetchHandler.js'
       )
       .set(
         require.resolve('happy-dom/lib/event/Event'),
-        'nativescript-dom/dist/Event.js'
+        'nativescript-html/dist/Event.js'
       )
       .set(
         require.resolve('happy-dom/lib/event/EventTarget'),
-        'nativescript-dom/dist/EventTarget.js'
+        'nativescript-html/dist/EventTarget.js'
       )
-      .set('node-fetch', 'nativescript-dom/lib/NodeFetch.js')
-      .set('perf_hooks', 'nativescript-dom/lib/Performance.js')
-      .set('vm', 'nativescript-dom/lib/VM.js');
+      .set('node-fetch', 'nativescript-html/lib/NodeFetch.js')
+      .set('perf_hooks', 'nativescript-html/lib/Performance.js')
+      .set('vm', 'nativescript-html/lib/VM.js');
   });
 
   return webpack.resolveConfig();
