@@ -1,11 +1,13 @@
 import { EventData, Observable } from '@nativescript/core';
 
 import { HTMLAbsoluteLayoutElement } from './HTMLAbsoluteLayoutElement';
-import { HTMLDivElement } from './HTMLDivElement';
+import { NHTMLDivElement } from './HTMLDivElement';
 import { HTMLDockLayoutElement } from './HTMLDockLayoutElement';
 import { HTMLFlexboxLayoutElement } from './HTMLFlexboxLayoutElement';
 import { HTMLGridLayoutElement } from './HTMLGridLayoutElement';
-import { HTMLParagraphElement } from './HTMLParagraphElement';
+import { NHTMLImageElement } from './HTMLImageElement';
+import { NHTMLParagraphElement } from './HTMLParagraphElement';
+import { NHTMLSpanElement } from './HTMLSpanElement';
 import { HTMLStackLayoutElement } from './HTMLStackLayoutElement';
 import { HTMLWrapLayoutElement } from './HTMLWrapLayoutElement';
 
@@ -38,17 +40,21 @@ export function registerAllElements(): void {
   HTMLWrapLayoutElement.register('wrap-layout');
 
   // Register our fun HTML fill-ins.
-  HTMLDivElement.register('div-');
+  NHTMLDivElement.register('div-');
   Object.defineProperty(global, 'HTMLDivElement', {
-    value: HTMLDivElement,
+    value: NHTMLDivElement,
   });
-  HTMLDivElement.register('p-');
+  NHTMLParagraphElement.register('p-');
   Object.defineProperty(global, 'HTMLParagraphElement', {
-    value: HTMLParagraphElement,
+    value: NHTMLParagraphElement,
   });
-  HTMLDivElement.register('span-');
+  NHTMLSpanElement.register('span-');
   Object.defineProperty(global, 'HTMLSpanElement', {
-    value: HTMLSpanElement,
+    value: NHTMLSpanElement,
+  });
+  NHTMLImageElement.register('img-');
+  Object.defineProperty(global, 'HTMLImageElement', {
+    value: NHTMLImageElement,
   });
 }
 

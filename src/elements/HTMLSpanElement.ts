@@ -1,6 +1,9 @@
 import { HTMLWebElement } from './HTMLWebElement';
 
-export class HTMLSpanElement extends HTMLWebElement {
+export class NHTMLSpanElement
+  extends HTMLWebElement
+  implements HTMLSpanElement
+{
   constructor() {
     super();
 

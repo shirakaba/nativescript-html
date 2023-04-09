@@ -1,3 +1,5 @@
-import { HTMLDivElement } from './HTMLDivElement';
+import { NHTMLDivElement } from './HTMLDivElement';
 
-export class HTMLParagraphElement extends HTMLDivElement {}
+export class NHTMLParagraphElement
+  extends NHTMLDivElement
+  implements HTMLParagraphElement {}

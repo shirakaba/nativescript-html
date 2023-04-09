@@ -1,5 +1,5 @@
 import { GlobalRegistrator } from '@happy-dom/global-registrator';
-import { FlexboxLayout, TextView } from '@nativescript/core';
+import { Button, FlexboxLayout, Image, TextView } from '@nativescript/core';
 
 import { patch as patchEvents } from './EventTarget';
 import {
@@ -48,6 +48,15 @@ declare global {
   }
   interface HTMLParagraphElement {
     view: FlexboxLayout;
+  }
+  interface HTMLSpanElement {
+    view: FlexboxLayout;
+  }
+  interface HTMLImageElement {
+    view: FlexboxLayout;
+  }
+  interface HTMLButtonElement {
+    view: Button;
   }
   interface Text {
     view: TextView;

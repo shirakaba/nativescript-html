@@ -65,7 +65,7 @@ export abstract class NHTMLElement<N extends View = View> extends HTMLElement {
 }
 
 // User agent HTMLElements we'll shim in ourselves.
-const intrinsicElements = new Set(['DIV', 'P', 'SPAN']);
+const intrinsicElements = new Set(['DIV', 'P', 'SPAN', 'IMG', 'BUTTON']);
 
 let patched = false;
 
