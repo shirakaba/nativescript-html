@@ -64,9 +64,19 @@ export abstract class NHTMLElement<N extends View = View> extends HTMLElement {
   // The Element methods for attribute-setting will be relatively constant.
 }
 
+// User agent HTMLElements we'll shim in ourselves.
+const intrinsicElements = new Set(['DIV', 'P', 'SPAN']);
+
+let patched = false;
+
 // We can only set dispatchEvent post-construction, so we'll do it by patching
 // createElement.
 export function patchCreateElement(document: typeof Document): void {
+  if (patched) {
+    return;
+  }
+  patched = true;
+
   const createElementNS = document.prototype.createElementNS;
 
   // @ts-ignore many overloads
@@ -79,7 +89,7 @@ export function patchCreateElement(document: typeof Document): void {
 
     // We'll register HTMLDivElement as a CustomElement, because happy-dom
     // doesn't provide it itself. CustomElements require a hyphen.
-    if (sanitisedName === 'DIV' || sanitisedName === 'P') {
+    if (intrinsicElements.has(sanitisedName)) {
       qualifiedName = `${sanitisedName}-`;
     }
 
@@ -92,7 +102,7 @@ export function patchCreateElement(document: typeof Document): void {
 
     // Remove the hyphen from any agent elements that we've bodged in as
     // CustomElements.
-    if (sanitisedName === 'DIV' || sanitisedName === 'P') {
+    if (intrinsicElements.has(sanitisedName)) {
       // @ts-ignore not actually readonly.
       element.tagName = sanitisedName;
     }

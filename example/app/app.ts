@@ -16,16 +16,10 @@ Application.run({
     div.style.backgroundColor = 'yellow';
 
     const p = document.createElement('p');
-    p.addEventListener('tap', (evt: CustomEvent<TapGestureEventData>) => {
-      const {
-        detail: { getX, getY },
-        currentTarget,
-      } = evt;
-      console.log(`Tapped ${currentTarget} at (${getX()}, ${getY()}).`);
-      evt.stopPropagation();
-    });
+    const span = document.createElement('span');
     p.style.backgroundColor = 'orange';
-    p.appendChild(document.createTextNode('Sonic'));
+    span.appendChild(document.createTextNode('Sonic'));
+    p.appendChild(span);
 
     div.appendChild(p);
 

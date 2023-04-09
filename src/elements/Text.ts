@@ -16,6 +16,9 @@ export class NText extends Text {
     this.view.padding = 0;
     this.view.margin = 0;
 
+    // TODO: cascade font styles from ancestors
+    this.view.fontSize = 24;
+
     // TODO: implement contenteditable
     this.view.editable = false;
   }

@@ -46,6 +46,10 @@ export function registerAllElements(): void {
   Object.defineProperty(global, 'HTMLParagraphElement', {
     value: HTMLParagraphElement,
   });
+  HTMLDivElement.register('span-');
+  Object.defineProperty(global, 'HTMLSpanElement', {
+    value: HTMLSpanElement,
+  });
 }
 
 export {
