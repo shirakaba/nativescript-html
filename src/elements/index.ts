@@ -5,6 +5,7 @@ import { HTMLDivElement } from './HTMLDivElement';
 import { HTMLDockLayoutElement } from './HTMLDockLayoutElement';
 import { HTMLFlexboxLayoutElement } from './HTMLFlexboxLayoutElement';
 import { HTMLGridLayoutElement } from './HTMLGridLayoutElement';
+import { HTMLParagraphElement } from './HTMLParagraphElement';
 import { HTMLStackLayoutElement } from './HTMLStackLayoutElement';
 import { HTMLWrapLayoutElement } from './HTMLWrapLayoutElement';
 
@@ -40,6 +41,10 @@ export function registerAllElements(): void {
   HTMLDivElement.register('div-');
   Object.defineProperty(global, 'HTMLDivElement', {
     value: HTMLDivElement,
+  });
+  HTMLDivElement.register('p-');
+  Object.defineProperty(global, 'HTMLParagraphElement', {
+    value: HTMLParagraphElement,
   });
 }
 

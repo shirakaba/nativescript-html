@@ -1,4 +1,5 @@
 import { GlobalRegistrator } from '@happy-dom/global-registrator';
+import { FlexboxLayout, TextView } from '@nativescript/core';
 
 import { patch as patchEvents } from './EventTarget';
 import {
@@ -11,6 +12,7 @@ import {
   HTMLWrapLayoutElement,
 } from './elements';
 import { patchCreateElement } from './elements/NHTMLElement';
+import { patch as patchText } from './elements/Text';
 
 // Register happy-dom classes like Event, EventTarget on the global namespace.
 GlobalRegistrator.register();
@@ -20,6 +22,9 @@ patchEvents();
 
 // Patch document.createElement to help with Custom Element setup.
 patchCreateElement(Document);
+
+// Patch window and document.createTextNode() to use our doctored Text, and .
+patchText(window, Document);
 
 // Register all the HTML Custom Elements (wrappers around NativeScript views).
 registerAllElements();
@@ -36,5 +41,15 @@ declare global {
     'grid-layout': HTMLGridLayoutElement;
     'stack-layout': HTMLStackLayoutElement;
     'wrap-layout': HTMLWrapLayoutElement;
+  }
+
+  interface HTMLDivElement {
+    view: FlexboxLayout;
+  }
+  interface HTMLParagraphElement {
+    view: FlexboxLayout;
+  }
+  interface Text {
+    view: TextView;
   }
 }

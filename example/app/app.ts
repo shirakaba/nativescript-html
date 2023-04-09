@@ -3,8 +3,8 @@ import 'nativescript-html';
 
 Application.run({
   create: () => {
-    const sl = document.createElement('div');
-    sl.addEventListener('tap', (evt: CustomEvent<TapGestureEventData>) => {
+    const div = document.createElement('div');
+    div.addEventListener('tap', (evt: CustomEvent<TapGestureEventData>) => {
       const {
         detail: { getX, getY },
         currentTarget,
@@ -13,12 +13,10 @@ Application.run({
       console.log(`Tapped ${currentTarget} at (${getX()}, ${getY()}).`);
       evt.stopPropagation();
     });
-    sl.style.backgroundColor = 'yellow';
-    sl.style.height = '100%';
-    sl.style.width = '100%';
+    div.style.backgroundColor = 'yellow';
 
-    const al = document.createElement('absolute-layout');
-    al.addEventListener('tap', (evt: CustomEvent<TapGestureEventData>) => {
+    const p = document.createElement('p');
+    p.addEventListener('tap', (evt: CustomEvent<TapGestureEventData>) => {
       const {
         detail: { getX, getY },
         currentTarget,
@@ -26,19 +24,12 @@ Application.run({
       console.log(`Tapped ${currentTarget} at (${getX()}, ${getY()}).`);
       evt.stopPropagation();
     });
-    al.style.backgroundColor = 'orange';
-    al.style.height = '200px';
-    al.style.width = '200px';
+    p.style.backgroundColor = 'orange';
+    p.appendChild(document.createTextNode('Sonic'));
 
-    sl.appendChild(al);
+    div.appendChild(p);
 
-    console.log('sl', sl);
-
-    //@ts-ignore
-    console.log('sl.view', sl.view);
-
-    //@ts-ignore
-    return sl.view;
+    return div.view;
   },
 });
 

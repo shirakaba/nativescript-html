@@ -1,6 +1,7 @@
 import { LayoutBase } from '@nativescript/core';
 
 import { NHTMLElement } from './NHTMLElement';
+import { NText } from './Text';
 
 // TODO: check whether this class could actually apply more widely to instances
 // of ContainerView, not just LayoutBase.
@@ -10,7 +11,7 @@ export abstract class HTMLLayoutBaseElement<
   appendChild<T extends Node>(node: T): T {
     const returnValue = super.appendChild(node);
 
-    if (node instanceof NHTMLElement) {
+    if (node instanceof NHTMLElement || node instanceof NText) {
       this.view.addChild(node.view);
     }
 
@@ -20,7 +21,7 @@ export abstract class HTMLLayoutBaseElement<
   removeChild<T extends Node>(child: T): T {
     const returnValue = super.removeChild(child);
 
-    if (child instanceof NHTMLElement) {
+    if (child instanceof NHTMLElement || child instanceof NText) {
       this.view.removeChild(child.view);
     }
 
@@ -31,7 +32,7 @@ export abstract class HTMLLayoutBaseElement<
     const returnValue = super.insertBefore(newNode, referenceNode);
 
     if (
-      newNode instanceof NHTMLElement &&
+      (newNode instanceof NHTMLElement || newNode instanceof NText) &&
       (referenceNode === null || referenceNode instanceof NHTMLElement)
     ) {
       if (referenceNode) {
