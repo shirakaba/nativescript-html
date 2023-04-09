@@ -3,7 +3,7 @@ import 'nativescript-html';
 
 Application.run({
   create: () => {
-    const sl = document.createElement('stack-layout');
+    const sl = document.createElement('div');
     sl.addEventListener('tap', (evt: CustomEvent<TapGestureEventData>) => {
       const {
         detail: { getX, getY },
@@ -32,6 +32,12 @@ Application.run({
 
     sl.appendChild(al);
 
+    console.log('sl', sl);
+
+    //@ts-ignore
+    console.log('sl.view', sl.view);
+
+    //@ts-ignore
     return sl.view;
   },
 });

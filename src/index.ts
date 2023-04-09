@@ -2,7 +2,7 @@ import { GlobalRegistrator } from '@happy-dom/global-registrator';
 
 import { patch as patchEvents } from './EventTarget';
 import {
-  registerAllCustomElements,
+  registerAllElements,
   HTMLAbsoluteLayoutElement,
   HTMLDockLayoutElement,
   HTMLFlexboxLayoutElement,
@@ -22,7 +22,7 @@ patchEvents();
 patchCreateElement(Document);
 
 // Register all the HTML Custom Elements (wrappers around NativeScript views).
-registerAllCustomElements();
+registerAllElements();
 
 // Tools for anyone to make their own custom elements.
 export { HTMLLayoutBaseElement } from './elements/HTMLLayoutBaseElement';

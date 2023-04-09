@@ -75,12 +75,27 @@ export function patchCreateElement(document: typeof Document): void {
     qualifiedName,
     options
   ): Element {
+    const sanitisedName = qualifiedName.toUpperCase().trim();
+
+    // We'll register HTMLDivElement as a CustomElement, because happy-dom
+    // doesn't provide it itself. CustomElements require a hyphen.
+    if (sanitisedName === 'DIV') {
+      qualifiedName = 'DIV-';
+    }
+
     const element = createElementNS.call(
       this,
       namespace,
       qualifiedName,
       options
     );
+
+    // Remove the hyphen from any agent elements that we've bodged in as
+    // CustomElements.
+    if (sanitisedName === 'DIV') {
+      //@ts-ignore not actually readonly.
+      element.tagName = sanitisedName;
+    }
 
     if (element instanceof NHTMLElement) {
       setDispatchEvent(element);

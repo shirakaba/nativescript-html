@@ -1,13 +1,14 @@
 import { EventData, Observable } from '@nativescript/core';
 
 import { HTMLAbsoluteLayoutElement } from './HTMLAbsoluteLayoutElement';
+import { HTMLDivElement } from './HTMLDivElement';
 import { HTMLDockLayoutElement } from './HTMLDockLayoutElement';
 import { HTMLFlexboxLayoutElement } from './HTMLFlexboxLayoutElement';
 import { HTMLGridLayoutElement } from './HTMLGridLayoutElement';
 import { HTMLStackLayoutElement } from './HTMLStackLayoutElement';
 import { HTMLWrapLayoutElement } from './HTMLWrapLayoutElement';
 
-export function registerAllCustomElements(): void {
+export function registerAllElements(): void {
   // (This is purely for debug)
   const on = Observable.prototype.on;
   Observable.prototype.on = function (
@@ -34,6 +35,12 @@ export function registerAllCustomElements(): void {
   HTMLGridLayoutElement.register('grid-layout');
   HTMLStackLayoutElement.register('stack-layout');
   HTMLWrapLayoutElement.register('wrap-layout');
+
+  // Register our fun HTML fill-ins.
+  HTMLDivElement.register('div-');
+  Object.defineProperty(global, 'HTMLDivElement', {
+    value: HTMLDivElement,
+  });
 }
 
 export {
