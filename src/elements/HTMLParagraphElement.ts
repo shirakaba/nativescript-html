@@ -5,8 +5,8 @@ export class NHTMLParagraphElement
   extends NHTMLDivElement
   implements HTMLParagraphElement
 {
-  postConstruction(): void {
-    super.postConstruction();
+  constructor() {
+    super();
 
     // font-size annoyingly doesn't cascade, so we'll lean on fontScale, which
     // does.

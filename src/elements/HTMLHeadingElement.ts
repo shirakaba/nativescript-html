@@ -5,10 +5,14 @@ export class NHTMLHeadingElement
   extends NHTMLDivElement
   implements HTMLHeadingElement
 {
+  constructor() {
+    super();
+    this.view.style.fontWeight = 'bold';
+  }
+
+  // this.tagName is not filled in until after construction
   postConstruction(): void {
     super.postConstruction();
-
-    this.view.style.fontWeight = 'bold';
 
     // We could use a11yscale here
     let fontSize = em;

@@ -33,7 +33,9 @@ export abstract class HTMLLayoutBaseElement<
 
     if (
       (newNode instanceof NHTMLElement || newNode instanceof NText) &&
-      (referenceNode === null || referenceNode instanceof NHTMLElement)
+      (referenceNode === null ||
+        referenceNode instanceof NHTMLElement ||
+        referenceNode instanceof NText)
     ) {
       if (referenceNode) {
         const childIndex = this.view.getChildIndex(referenceNode.view);

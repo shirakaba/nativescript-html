@@ -14,8 +14,8 @@ export class NHTMLImageElement
 
     this.style.display = 'block';
     this.view.addChild(this.image);
-    console.log('View with Img:', this.view);
   }
+
   longDesc = '';
 
   align = '';

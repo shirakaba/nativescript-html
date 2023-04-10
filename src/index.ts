@@ -52,11 +52,16 @@ declare global {
   interface HTMLSpanElement {
     view: FlexboxLayout;
   }
-  interface HTMLImageElement {
+  interface HTMLSpanElement {
     view: FlexboxLayout;
   }
+  interface HTMLImageElement {
+    view: FlexboxLayout;
+    image: Image;
+  }
   interface HTMLButtonElement {
-    view: Button;
+    view: FlexboxLayout;
+    button: Button;
   }
   interface Text {
     view: TextView;
