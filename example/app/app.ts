@@ -41,20 +41,19 @@ Application.run({
     div.appendChild(h5);
     div.appendChild(h6);
 
-    // const img = document.createElement('img');
-    // img.src = 'https://www.w3.org/html/logo/downloads/HTML5_Logo_512.png';
-    // img.height = 430;
-    // img.width = 430;
-    // div.appendChild(img);
+    const img = document.createElement('img');
+    img.src = 'https://www.w3.org/html/logo/downloads/HTML5_Logo_512.png';
+    img.height = 100;
+    img.width = 100;
+    div.appendChild(img);
 
-    // const p = document.createElement('p');
-    // const span = document.createElement('span');
-    // span.appendChild(
-    //   document.createTextNode('Introducing HTML, with native views!')
-    // );
-    // p.appendChild(span);
-    // p.style.paddingTop = '20px';
-    // div.appendChild(p);
+    const p = document.createElement('p');
+    const span = document.createElement('span');
+    span.appendChild(
+      document.createTextNode('Introducing HTML, with native views!')
+    );
+    p.appendChild(span);
+    div.appendChild(p);
 
     return div.view;
   },

@@ -16,9 +16,7 @@ export class NText extends Text {
     this.view.padding = 0;
     this.view.margin = 0;
 
-    // This is the calculated value for font-size in px in iOS Safari on an
-    // iPhone 14 Pro Max.
-    this.view.fontSize = 16;
+    this.view.fontSize = em;
 
     // TODO: implement contenteditable
     this.view.editable = false;
@@ -49,3 +47,7 @@ export function patch(window: Window, document: typeof Document): void {
     },
   });
 }
+
+// This is the calculated value for font-size in px in iOS Safari on an iPhone
+// 14 Pro Max.
+export const em = 16;

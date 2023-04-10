@@ -1,4 +1,5 @@
 import { NHTMLDivElement } from './HTMLDivElement';
+import { em } from './Text';
 
 export class NHTMLHeadingElement
   extends NHTMLDivElement
@@ -10,7 +11,6 @@ export class NHTMLHeadingElement
     this.view.style.fontWeight = 'bold';
 
     // We could use a11yscale here
-    const em = 16;
     let fontSize = em;
     let verticalMargin = em;
 
