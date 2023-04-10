@@ -1,6 +1,7 @@
 import { EventData, Observable } from '@nativescript/core';
 
 import { HTMLAbsoluteLayoutElement } from './HTMLAbsoluteLayoutElement';
+import { NHTMLButtonElement } from './HTMLButtonElement';
 import { NHTMLDivElement } from './HTMLDivElement';
 import { HTMLDockLayoutElement } from './HTMLDockLayoutElement';
 import { HTMLFlexboxLayoutElement } from './HTMLFlexboxLayoutElement';
@@ -53,12 +54,14 @@ export function registerAllElements(): void {
   NHTMLHeadingElement.register('h5-');
   NHTMLHeadingElement.register('h6-');
   NHTMLImageElement.register('img-');
+  NHTMLButtonElement.register('button-');
   Object.defineProperties(global, {
     HTMLDivElement: { value: NHTMLDivElement },
     HTMLParagraphElement: { value: NHTMLParagraphElement },
     HTMLSpanElement: { value: NHTMLSpanElement },
     HTMLHeadingElement: { value: NHTMLHeadingElement },
     HTMLImageElement: { value: NHTMLImageElement },
+    HTMLButtonElement: { value: NHTMLButtonElement },
   });
 }
 

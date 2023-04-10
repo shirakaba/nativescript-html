@@ -54,6 +54,10 @@ Application.run({
     p.appendChild(span);
     div.appendChild(p);
 
+    const button = document.createElement('button');
+    button.appendChild(document.createTextNode('A button!'));
+    div.appendChild(button);
+
     return div.view;
   },
 });
