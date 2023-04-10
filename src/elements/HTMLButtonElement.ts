@@ -3,7 +3,7 @@ import NodeList from 'happy-dom/lib/nodes/node/NodeList';
 import HappyValidityState from 'happy-dom/lib/nodes/validity-state/ValidityState';
 
 import { HTMLWebElement } from './HTMLWebElement';
-import { NText, em } from './Text';
+import { NText } from './Text';
 
 export class NHTMLButtonElement
   extends HTMLWebElement
@@ -18,18 +18,6 @@ export class NHTMLButtonElement
 
     this.style.display = 'inline-block';
     this.view.addChild(this.button);
-    this.button.text = 'placeholder';
-
-    // font-size annoyingly doesn't cascade, so we'll lean on fontScale, which
-    // does.
-
-    // this.view.style.fontSize = fontSize;
-    // I'm not sure whether setting this to 1 explicitly is redundant; depends
-    // how the cascading works.
-    this.view.style._fontScale = 11 / em;
-
-    this.view.style.paddingLeft = 11;
-    this.view.style.paddingRight = 11;
   }
 
   // Horrible makeshift way to mirror the textContent of Texts into the Button.

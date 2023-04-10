@@ -15,8 +15,6 @@ export class NText extends Text {
     this.view.padding = 0;
     this.view.margin = 0;
 
-    this.view.fontSize = em;
-
     // TODO: implement contenteditable. TextView is editable, but it brings a
     // scrollbar which I don't know how to suppress.
     this.view.maxLines = 0;

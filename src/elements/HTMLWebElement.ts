@@ -59,11 +59,13 @@ export abstract class HTMLWebElement extends HTMLFlexboxLayoutElement {
     flexWrapBefore: this.view.flexWrapBefore,
   };
 
+  // this.tagName is not filled in until after construction
   postConstruction(): void {
     super.postConstruction();
 
     // @ts-ignore not actually readonly.
     this.tagName = this.tagName.replace('-', '');
+    this.view.cssClasses.add(this.tagName.toLowerCase());
   }
 
   get style(): CSSStyleDeclaration {
