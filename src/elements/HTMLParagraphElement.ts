@@ -18,5 +18,10 @@ export class NHTMLParagraphElement
 
     this.view.style.marginTop = em;
     this.view.style.marginBottom = em;
+
+    this.style.display = 'flex';
+    this.style.width = '100%';
+    this.view.style.flexDirection = 'row';
+    this.view.style.flexWrap = 'wrap';
   }
 }
