@@ -84,6 +84,7 @@ const intrinsicElements = new Set([
   'H4',
   'H5',
   'H6',
+  'A',
 ]);
 
 let patched = false;

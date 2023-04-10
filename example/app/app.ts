@@ -58,6 +58,10 @@ Application.run({
     button.appendChild(document.createTextNode('A button!'));
     div.appendChild(button);
 
+    const a = document.createElement('a');
+    a.appendChild(document.createTextNode('A hyperlink!'));
+    div.appendChild(a);
+
     return div.view;
   },
 });
