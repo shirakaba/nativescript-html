@@ -1,12 +1,11 @@
-import { TextView } from '@nativescript/core';
+import { Label } from '@nativescript/core';
 import { Text } from 'happy-dom';
 
 let patched = false;
 
 export class NText extends Text {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  readonly view = new (require('@nativescript/core')
-    .TextView as typeof TextView)();
+  readonly view = new (require('@nativescript/core').Label as typeof Label)();
 
   constructor(data: string) {
     super(data);
@@ -18,8 +17,9 @@ export class NText extends Text {
 
     this.view.fontSize = em;
 
-    // TODO: implement contenteditable
-    this.view.editable = false;
+    // TODO: implement contenteditable. TextView is editable, but it brings a
+    // scrollbar which I don't know how to suppress.
+    this.view.maxLines = 0;
   }
 
   set data(data: string) {

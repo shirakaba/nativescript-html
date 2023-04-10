@@ -13,11 +13,8 @@ Application.run({
       console.log(`Tapped ${currentTarget} at (${getX()}, ${getY()}).`);
       evt.stopPropagation();
     });
-    div.style.display = 'flex';
-    div.style.flexDirection = 'column';
-    div.style.justifyContent = 'center';
-    div.style.alignItems = 'center';
-    div.style.width = '100%';
+    div.style.display = 'block';
+    div.style.margin = '8px';
 
     // The spacing looks a bit odd because of the margin. In true block layout,
     // margins collapse, but we're limited to what flexbox can do (until Mason).
@@ -50,7 +47,9 @@ Application.run({
     const p = document.createElement('p');
     const span = document.createElement('span');
     span.appendChild(
-      document.createTextNode('Introducing HTML, with native views!')
+      document.createTextNode(
+        'Introducing HTML, with native views! Introducing HTML, with native views! Introducing HTML, with native views! Introducing HTML, with native views!'
+      )
     );
     p.appendChild(span);
     div.appendChild(p);
