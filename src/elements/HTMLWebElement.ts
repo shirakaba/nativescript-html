@@ -59,6 +59,13 @@ export abstract class HTMLWebElement extends HTMLFlexboxLayoutElement {
     flexWrapBefore: this.view.flexWrapBefore,
   };
 
+  postConstruction(): void {
+    super.postConstruction();
+
+    // @ts-ignore not actually readonly.
+    this.tagName = this.tagName.replace('-', '');
+  }
+
   get style(): CSSStyleDeclaration {
     return new Proxy(this.view.style, {
       get: (target, p, receiver) => {

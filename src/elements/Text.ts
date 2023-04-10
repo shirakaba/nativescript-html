@@ -16,8 +16,9 @@ export class NText extends Text {
     this.view.padding = 0;
     this.view.margin = 0;
 
-    // TODO: cascade font styles from ancestors
-    this.view.fontSize = 24;
+    // This is the calculated value for font-size in px in iOS Safari on an
+    // iPhone 14 Pro Max.
+    this.view.fontSize = 16;
 
     // TODO: implement contenteditable
     this.view.editable = false;

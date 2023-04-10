@@ -19,20 +19,42 @@ Application.run({
     div.style.alignItems = 'center';
     div.style.width = '100%';
 
-    const img = document.createElement('img');
-    img.src = 'https://www.w3.org/html/logo/downloads/HTML5_Logo_512.png';
-    img.height = 430;
-    img.width = 430;
-    div.appendChild(img);
+    // The spacing looks a bit odd because of the margin. In true block layout,
+    // margins collapse, but we're limited to what flexbox can do (until Mason).
+    const h1 = document.createElement('h1');
+    h1.appendChild(document.createTextNode('Heading 1'));
+    const h2 = document.createElement('h2');
+    h2.appendChild(document.createTextNode('Heading 2'));
+    const h3 = document.createElement('h3');
+    h3.appendChild(document.createTextNode('Heading 3'));
+    const h4 = document.createElement('h4');
+    h4.appendChild(document.createTextNode('Heading 4'));
+    const h5 = document.createElement('h5');
+    h5.appendChild(document.createTextNode('Heading 5'));
+    const h6 = document.createElement('h6');
+    h6.appendChild(document.createTextNode('Heading 6'));
 
-    const p = document.createElement('p');
-    const span = document.createElement('span');
-    span.appendChild(
-      document.createTextNode('Introducing HTML, with native views!')
-    );
-    p.appendChild(span);
-    p.style.paddingTop = '20px';
-    div.appendChild(p);
+    div.appendChild(h1);
+    div.appendChild(h2);
+    div.appendChild(h3);
+    div.appendChild(h4);
+    div.appendChild(h5);
+    div.appendChild(h6);
+
+    // const img = document.createElement('img');
+    // img.src = 'https://www.w3.org/html/logo/downloads/HTML5_Logo_512.png';
+    // img.height = 430;
+    // img.width = 430;
+    // div.appendChild(img);
+
+    // const p = document.createElement('p');
+    // const span = document.createElement('span');
+    // span.appendChild(
+    //   document.createTextNode('Introducing HTML, with native views!')
+    // );
+    // p.appendChild(span);
+    // p.style.paddingTop = '20px';
+    // div.appendChild(p);
 
     return div.view;
   },

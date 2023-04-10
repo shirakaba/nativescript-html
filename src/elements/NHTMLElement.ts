@@ -23,6 +23,13 @@ export abstract class NHTMLElement<N extends View = View> extends HTMLElement {
   // event that's useless in the first place.
   abstract readonly view: N;
 
+  postConstruction(): void {
+    // Give the view a way to directly call the dispatchEvent() method of its DOM
+    // container.
+    (this.view as Dispatcher<N>).dispatchEvent = (event: Event) =>
+      this.dispatchEvent(event);
+  }
+
   // happy-dom does implement CSS but it's easiest just to use what NativeScript
   // gives us.
   get style(): CSSStyleDeclaration {
@@ -65,7 +72,19 @@ export abstract class NHTMLElement<N extends View = View> extends HTMLElement {
 }
 
 // User agent HTMLElements we'll shim in ourselves.
-const intrinsicElements = new Set(['DIV', 'P', 'SPAN', 'IMG', 'BUTTON']);
+const intrinsicElements = new Set([
+  'DIV',
+  'P',
+  'SPAN',
+  'IMG',
+  'BUTTON',
+  'H1',
+  'H2',
+  'H3',
+  'H4',
+  'H5',
+  'H6',
+]);
 
 let patched = false;
 
@@ -100,24 +119,10 @@ export function patchCreateElement(document: typeof Document): void {
       options
     );
 
-    // Remove the hyphen from any agent elements that we've bodged in as
-    // CustomElements.
-    if (intrinsicElements.has(sanitisedName)) {
-      // @ts-ignore not actually readonly.
-      element.tagName = sanitisedName;
-    }
-
     if (element instanceof NHTMLElement) {
-      setDispatchEvent(element);
+      element.postConstruction();
     }
 
     return element;
   };
-}
-
-// Give the view a way to directly call the dispatchEvent() method of its DOM
-// container.
-function setDispatchEvent<T extends View>(domElement: NHTMLElement<T>): void {
-  (domElement.view as Dispatcher<T>).dispatchEvent = (event: Event) =>
-    domElement.dispatchEvent(event);
 }

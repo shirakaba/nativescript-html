@@ -5,6 +5,7 @@ import { NHTMLDivElement } from './HTMLDivElement';
 import { HTMLDockLayoutElement } from './HTMLDockLayoutElement';
 import { HTMLFlexboxLayoutElement } from './HTMLFlexboxLayoutElement';
 import { HTMLGridLayoutElement } from './HTMLGridLayoutElement';
+import { NHTMLHeadingElement } from './HTMLHeadingElement';
 import { NHTMLImageElement } from './HTMLImageElement';
 import { NHTMLParagraphElement } from './HTMLParagraphElement';
 import { NHTMLSpanElement } from './HTMLSpanElement';
@@ -40,21 +41,24 @@ export function registerAllElements(): void {
   HTMLWrapLayoutElement.register('wrap-layout');
 
   // Register our fun HTML fill-ins.
+  // Remember to update the set of intrinsic elements in
+  // src/elements/NHTMLElement.ts each time we add support for a new one here.
   NHTMLDivElement.register('div-');
-  Object.defineProperty(global, 'HTMLDivElement', {
-    value: NHTMLDivElement,
-  });
   NHTMLParagraphElement.register('p-');
-  Object.defineProperty(global, 'HTMLParagraphElement', {
-    value: NHTMLParagraphElement,
-  });
   NHTMLSpanElement.register('span-');
-  Object.defineProperty(global, 'HTMLSpanElement', {
-    value: NHTMLSpanElement,
-  });
+  NHTMLHeadingElement.register('h1-');
+  NHTMLHeadingElement.register('h2-');
+  NHTMLHeadingElement.register('h3-');
+  NHTMLHeadingElement.register('h4-');
+  NHTMLHeadingElement.register('h5-');
+  NHTMLHeadingElement.register('h6-');
   NHTMLImageElement.register('img-');
-  Object.defineProperty(global, 'HTMLImageElement', {
-    value: NHTMLImageElement,
+  Object.defineProperties(global, {
+    HTMLDivElement: { value: NHTMLDivElement },
+    HTMLParagraphElement: { value: NHTMLParagraphElement },
+    HTMLSpanElement: { value: NHTMLSpanElement },
+    HTMLHeadingElement: { value: NHTMLHeadingElement },
+    HTMLImageElement: { value: NHTMLImageElement },
   });
 }
 
