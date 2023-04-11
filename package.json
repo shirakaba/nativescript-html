@@ -24,8 +24,8 @@
   },
   "homepage": "https://github.com/shirakaba/nativescript-html#readme",
   "dependencies": {
-    "@happy-dom/global-registrator": "^5.3.1",
-    "happy-dom": "^5.2.0",
+    "@happy-dom/global-registrator": "^9.2.1",
+    "happy-dom": "^9.2.1",
     "set-value": "^4.1.0"
   },
   "peerDependencies": {
@@ -33,18 +33,17 @@
   },
   "devDependencies": {
     "@nativescript/core": "^8.5.0",
-    "@nativescript/ios": "8.4.1",
     "@types/set-value": "^4.0.1",
-    "@typescript-eslint/eslint-plugin": "^5.48.2",
-    "@typescript-eslint/parser": "^5.48.2",
-    "eslint": "^8.32.0",
-    "eslint-config-prettier": "^8.6.0",
+    "@typescript-eslint/eslint-plugin": "^5.58.0",
+    "@typescript-eslint/parser": "^5.58.0",
+    "eslint": "^8.38.0",
+    "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-import": "^2.27.5",
     "husky": "8.0.3",
     "lint-staged": "13.2.0",
     "prettier": "2.8.4",
     "prettier-plugin-organize-attributes": "0.0.5",
-    "typescript": "^5.0.3"
+    "typescript": "^5.0.4"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,css,md,json}": "prettier --write",

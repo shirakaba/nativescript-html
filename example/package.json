@@ -5,14 +5,14 @@
   "private": true,
   "dependencies": {
     "@nativescript/core": "^8.5.0",
+    "@nativescript/ios": "^8.5.1",
     "@nativescript/theme": "~3.0.2",
     "nativescript-html": "file:..",
     "url": "^0.11.0"
   },
   "devDependencies": {
-    "@nativescript/android": "8.2.3",
-    "@nativescript/ios": "8.2.3",
-    "@nativescript/types": "~8.2.0",
+    "@nativescript/android": "^8.5.0",
+    "@nativescript/types": "^8.5.0",
     "@nativescript/webpack": "~5.0.6",
     "typescript": "^5.0.3"
   }
