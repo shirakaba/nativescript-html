@@ -1,6 +1,6 @@
 import { Button } from '@nativescript/core';
 import NodeList from 'happy-dom/lib/nodes/node/NodeList';
-import HappyValidityState from 'happy-dom/lib/nodes/validity-state/ValidityState';
+import HappyValidityState from 'happy-dom/lib/validity-state/ValidityState';
 
 import { HTMLWebElement } from './HTMLWebElement';
 import { NText } from './Text';
@@ -29,7 +29,7 @@ export class NHTMLButtonElement
     this.view.addChild(this.button);
 
     if (node instanceof NText) {
-      this.button.text = node.textContent;
+      this.button.text = node.textContent || '';
     }
 
     return returnValue;
@@ -54,7 +54,7 @@ export class NHTMLButtonElement
       newNode instanceof NText &&
       (referenceNode === null || referenceNode instanceof NText)
     ) {
-      this.button.text = newNode.textContent;
+      this.button.text = newNode.textContent || '';
     }
 
     return returnValue;

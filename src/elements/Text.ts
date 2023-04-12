@@ -1,9 +1,10 @@
 import { Label } from '@nativescript/core';
-import { Text } from 'happy-dom';
 
 let patched = false;
 
-export class NText extends Text {
+declare const window: { Text: typeof Text };
+
+export class NText extends window.Text {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   readonly view = new (require('@nativescript/core').Label as typeof Label)();
 
@@ -18,6 +19,45 @@ export class NText extends Text {
     // TODO: implement contenteditable. TextView is editable, but it brings a
     // scrollbar which I don't know how to suppress.
     this.view.maxLines = 0;
+  }
+
+  get wholeText(): string {
+    let wholeText = '';
+
+    let prev = this.previousSibling;
+    while (prev && prev.nodeType === Node.TEXT_NODE) {
+      wholeText = wholeText + (prev as unknown as Text).data;
+      prev = prev.previousSibling;
+    }
+
+    wholeText += this.data;
+
+    let next = this.nextSibling;
+    while (next && next.nodeType === Node.TEXT_NODE) {
+      wholeText += (next as unknown as Text).data;
+      next = next.nextSibling;
+    }
+
+    return wholeText;
+  }
+
+  set wholeText(value: string) {
+    const toRemove: Text[] = [];
+
+    let prev = this.previousSibling;
+    while (prev && prev.nodeType === Node.TEXT_NODE) {
+      toRemove.unshift(prev as Text);
+      prev = prev.previousSibling;
+    }
+
+    let next = this.nextSibling;
+    while (next && next.nodeType === Node.TEXT_NODE) {
+      toRemove.push(next as Text);
+      next = next.nextSibling;
+    }
+
+    toRemove.forEach((text) => text.remove());
+    this.data = value;
   }
 
   set data(data: string) {

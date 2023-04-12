@@ -13,6 +13,7 @@ module.exports = (env) => {
      *   npm install --save buffer
      */
     const supportBuffer = false;
+
     /**
      * If you wish to use window.FileReader, set both this and supportBuffer
      * to `true` and run:
@@ -20,16 +21,27 @@ module.exports = (env) => {
      */
     const supportFileReader = false;
 
+    /**
+     * If you wish to use window.ReadableStream, window.WritableStream, and
+     * window.TransformStream, set this to `true` and run:
+     *   npm install --save buffer stream-browserify
+     */
+    const supportStream = false;
+
     config.resolve.set('fallback', {
       ...{
         buffer: supportBuffer ? require.resolve('buffer') : false,
       },
-      ...(supportFileReader && supportBuffer
-        ? {
-            stream: require.resolve('stream-browserify'),
-            util: require.resolve('util'),
-          }
-        : {}),
+      ...{
+        util:
+          supportFileReader && supportBuffer ? require.resolve('util') : false,
+      },
+      ...{
+        stream:
+          supportStream || (supportFileReader && supportBuffer)
+            ? require.resolve('stream-browserify')
+            : false,
+      },
     });
 
     if (!supportFileReader) {
@@ -61,8 +73,28 @@ module.exports = (env) => {
     // > Watchpack Error (initial scan): Error: ENOTDIR: not a directory, scandir '/Users/jamie/Documents/git/nativescript-html/node_modules/happy-dom/lib/fetch/ResourceFetchHandler.js'
     config.resolve.alias
       .set(
-        require.resolve('happy-dom/lib/fetch/ResourceFetchHandler'),
-        'nativescript-html/lib/ResourceFetchHandler.js'
+        require.resolve('happy-dom/lib/xml-http-request/XMLHttpRequest'),
+        'nativescript-html/lib/XMLHttpRequest.js'
+      )
+      .set(
+        require.resolve('happy-dom/lib/fetch/Fetch'),
+        'nativescript-html/lib/fetch/Fetch.js'
+      )
+      .set(
+        require.resolve('happy-dom/lib/fetch/Request'),
+        'nativescript-html/lib/fetch/Request.js'
+      )
+      .set(
+        require.resolve('happy-dom/lib/fetch/Response'),
+        'nativescript-html/lib/fetch/Response.js'
+      )
+      .set(
+        require.resolve('happy-dom/lib/fetch/Headers'),
+        'nativescript-html/lib/fetch/Headers.js'
+      )
+      .set(
+        require.resolve('happy-dom/lib/location/Location'),
+        'nativescript-html/lib/Location.js'
       )
       .set(
         require.resolve('happy-dom/lib/event/Event'),

@@ -454,14 +454,17 @@ export function patch(): void {
   }
   patched = true;
 
-  // happy-dom overrides dispatchEvent() on Node rather than just implementing
-  // it on EventTarget (and to be fair, that's a cleaner approach). But as we've
-  // been quite lazy and defined a Node-aware EventTarget, we'll want to delete
-  // this override to make sure it uses our EventTarget implementation.
+  // happy-dom overrides dispatchEvent() on Node and Event rather than just
+  // implementing it on EventTarget (and to be fair, that's a smarter approach).
+  // But as we've been quite lazy and defined a Node-aware EventTarget, we'll
+  // want to delete this override to make sure it uses our EventTarget
+  // implementation. In future we'd best try to mirror their approach.
   //
-  // @ts-ignore Removal of this non-optional method is safe because the
-  // superclass provides it.
+  // @ts-ignore Removal of these non-optional methods are safe because their
+  // superclass, EventTarget, provides it.
   delete Node.prototype.dispatchEvent;
+  // @ts-ignore
+  delete Element.prototype.dispatchEvent;
 
   // We patch notify() to re-fire all non-user NativeScript events as DOM
   // Events.

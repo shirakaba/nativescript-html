@@ -1,5 +1,11 @@
+/* eslint-disable import/first */
+// eslint-disable-next-line import/order
 import { GlobalRegistrator } from '@happy-dom/global-registrator';
-import { Button, FlexboxLayout, Image, TextView } from '@nativescript/core';
+
+// Register happy-dom classes like Event, EventTarget on the global namespace.
+GlobalRegistrator.register();
+
+import { Button, FlexboxLayout, Image, Label } from '@nativescript/core';
 
 import { patch as patchEvents } from './EventTarget';
 import {
@@ -13,9 +19,6 @@ import {
 } from './elements';
 import { patchCreateElement } from './elements/NHTMLElement';
 import { patch as patchText } from './elements/Text';
-
-// Register happy-dom classes like Event, EventTarget on the global namespace.
-GlobalRegistrator.register();
 
 // Patch NativeScript events and gestures.
 patchEvents();
@@ -64,6 +67,6 @@ declare global {
     button: Button;
   }
   interface Text {
-    view: TextView;
+    view: Label;
   }
 }

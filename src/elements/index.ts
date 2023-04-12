@@ -14,6 +14,10 @@ import { NHTMLSpanElement } from './HTMLSpanElement';
 import { HTMLStackLayoutElement } from './HTMLStackLayoutElement';
 import { HTMLWrapLayoutElement } from './HTMLWrapLayoutElement';
 
+// Core's type declarations for global haven't worked since a change to
+// @types/node, so we'll just shove this in here
+declare const global: any;
+
 export function registerAllElements(): void {
   // (This is purely for debug)
   const on = Observable.prototype.on;
