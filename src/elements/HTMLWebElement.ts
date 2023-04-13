@@ -85,17 +85,40 @@ export abstract class HTMLWebElement extends HTMLFlexboxLayoutElement {
         return Reflect.get(target, p, receiver);
       },
       set: (target, p, newValue, receiver) => {
-        if (p in this.userLayoutStyles) {
+        let normalisedName: string;
+        let symbolIsSource: boolean;
+        if (typeof p === 'symbol') {
+          const [left, right] = p
+            .toString()
+            .replace('Symbol(', '')
+            .replace(')', '')
+            .split(':');
+          if (right === 'valueSourceKey') {
+            normalisedName = left;
+          } else {
+            normalisedName = right;
+          }
+          symbolIsSource = left === 'computed-source';
+        } else {
+          normalisedName = p;
+          symbolIsSource = true;
+        }
+
+        if (
+          p in this.userLayoutStyles ||
+          (normalisedName in this.userLayoutStyles && symbolIsSource)
+        ) {
           // Really I should set the parsed value (e.g. by running the parser
           // that the respective property uses), but this'll do for a proof of
           // concept.
-          this.userLayoutStyles[p as keyof typeof this.userLayoutStyles] =
-            newValue;
+          this.userLayoutStyles[
+            normalisedName as keyof typeof this.userLayoutStyles
+          ] = newValue;
 
           // If it's a layout style, set it on the underlying view only
           // compatible with the display method.
           if (this.display === 'block' || this.display === 'inline-block') {
-            if (p !== 'height' && p !== 'width') {
+            if (normalisedName !== 'height' && normalisedName !== 'width') {
               return true;
             }
           } else if (this.display === 'inline') {
