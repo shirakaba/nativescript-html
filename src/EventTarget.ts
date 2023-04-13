@@ -74,7 +74,7 @@ export default class NEventTarget<N extends View = View>
     callback: EventListenerOrEventListenerObject | null,
     options?: AddEventListenerOptions | boolean
   ): void {
-    console.log(`${this.constructor.name}.addEventListener('${type}') !`);
+    // console.log(`${this.constructor.name}.addEventListener('${type}') !`);
     if (!callback) {
       return;
     }
@@ -487,13 +487,13 @@ export function patch(): void {
     // event listener handling to the event itself.
 
     if ((this as Dispatcher).dispatchEvent) {
-      console.log(
-        `calling ${this.constructor.name}.dispatchEvent('${eventName}')...`
-      );
+      // console.log(
+      //   `calling ${this.constructor.name}.dispatchEvent('${eventName}')...`
+      // );
       // It's a View that we've wrapped
       (this as Dispatcher).dispatchEvent(event);
     } else {
-      console.log(`calling window.dispatchEvent('${eventName}')...`);
+      // console.log(`calling window.dispatchEvent('${eventName}')...`);
       // Either we haven't wrapped the view yet (e.g. the "created" event was
       // fired during the View's constructor) or it's some view that wasn't made
       // in userland (e.g. the accessibility singleton).

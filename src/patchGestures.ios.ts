@@ -159,7 +159,6 @@ export function patchGestures(): void {
     if (delegate) {
       recognizer.delegate =
         patchedRecognizerDelegateInstance as UIGestureRecognizerDelegateImpl;
-      console.log('replaced delegate!');
     }
 
     return recognizer;

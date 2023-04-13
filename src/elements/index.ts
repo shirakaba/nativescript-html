@@ -26,7 +26,7 @@ export function registerAllElements(): void {
     callback: (data: EventData) => void,
     thisArg?: any
   ): void {
-    console.log(`${this.constructor.name}.on('${eventNames}')`);
+    // console.log(`${this.constructor.name}.on('${eventNames}')`);
     on.call(this, eventNames, callback, thisArg);
   };
   const addEventListener = Observable.prototype.addEventListener;
@@ -35,7 +35,7 @@ export function registerAllElements(): void {
     callback: (data: EventData) => void,
     thisArg?: any
   ): void {
-    console.log(`${this.constructor.name}.addEventListener('${eventNames}')`);
+    // console.log(`${this.constructor.name}.addEventListener('${eventNames}')`);
     addEventListener.call(this, eventNames, callback, thisArg);
   };
 

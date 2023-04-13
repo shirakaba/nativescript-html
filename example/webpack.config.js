@@ -1,13 +1,17 @@
 const path = require('path');
 const webpack = require('@nativescript/webpack');
 
+require('util').inspect.defaultOptions.depth = null;
+
 module.exports = (env) => {
   webpack.init(env);
 
   // Learn how to customize:
   // https://docs.nativescript.org/webpack
 
-  webpack.chainWebpack((config) => {
+  webpack.chainWebpack((config, env) => {
+    supportReact(config, env);
+
     /**
      * If you wish to use window.Buffer, set this to `true` and run:
      *   npm install --save buffer
@@ -95,5 +99,59 @@ module.exports = (env) => {
       .set('vm', 'nativescript-html/lib/VM.js');
   });
 
-  return webpack.resolveConfig();
+  const resolved = webpack.resolveConfig();
+  // console.log('resolved', resolved);
+
+  // Make nativescript-hot-loader test .tsx files (not sure how to chain).
+  resolved.module.rules[2].test = /\.(js|ts)x?$/;
+
+  return resolved;
 };
+
+/**
+ * @param {import('webpack-chain')} config
+ * @param {import('@nativescript/webpack').IWebpackEnv} env
+ */
+function supportReact(config, env) {
+  const production = !!env.production;
+
+  const platform = webpack.Utils.platform.getPlatformName();
+  config.resolve.extensions.prepend('.tsx').prepend(`.${platform}.tsx`);
+
+  config.module
+    .rule('ts')
+    .test([...config.module.rule('ts').get('test'), /\.tsx$/]);
+
+  config.module
+    .rule('ts')
+    .test([...config.module.rule('ts').get('test'), /\.tsx$/]);
+
+  // todo: use env
+  let isAnySourceMapEnabled = true;
+
+  // todo: env flag to forceEnable?
+  config.when(env.hmr && !production, (config) => {
+    config.module
+      .rule('ts')
+      .use('babel-loader|react-refresh')
+      .loader('babel-loader')
+      .before('ts-loader')
+      .options({
+        sourceMaps: isAnySourceMapEnabled ? 'inline' : false,
+        babelrc: false,
+        plugins: ['react-refresh/babel'],
+      });
+
+    config
+      .plugin('ReactRefreshPlugin')
+      .use(require('@pmmmwh/react-refresh-webpack-plugin'), [
+        {
+          /**
+           * Maybe one day we'll implement an Error Overlay, but the work involved is too daunting for now.
+           * @see https://github.com/pmmmwh/react-refresh-webpack-plugin/issues/79#issuecomment-644324557
+           */
+          overlay: false,
+        },
+      ]);
+  });
+}

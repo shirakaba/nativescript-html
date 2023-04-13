@@ -1,6 +1,6 @@
 {
   "name": "example",
-  "main": "app/app.ts",
+  "main": "app/main.ts",
   "version": "1.0.0",
   "private": true,
   "dependencies": {
@@ -8,12 +8,16 @@
     "@nativescript/ios": "^8.5.1",
     "@nativescript/theme": "~3.0.2",
     "nativescript-html": "file:..",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "url": "^0.11.0"
   },
   "devDependencies": {
     "@nativescript/android": "^8.5.0",
     "@nativescript/types": "^8.5.0",
     "@nativescript/webpack": "~5.0.6",
+    "@types/react": "^18.0.35",
+    "@types/react-dom": "^18.0.11",
     "typescript": "^5.0.3"
   }
 }

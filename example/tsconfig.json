@@ -8,6 +8,7 @@
     "noEmitHelpers": true,
     "noEmitOnError": true,
     "skipLibCheck": true,
+    "jsx": "react-jsx",
     "lib": ["es2017", "dom"],
     "baseUrl": ".",
     "paths": {
