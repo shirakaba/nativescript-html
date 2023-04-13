@@ -1,7 +1,4 @@
-﻿@import '@nativescript/theme/css/core.css';
-@import '@nativescript/theme/css/default.css';
-
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
 

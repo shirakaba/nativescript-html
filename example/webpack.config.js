@@ -100,7 +100,6 @@ module.exports = (env) => {
   });
 
   const resolved = webpack.resolveConfig();
-  // console.log('resolved', resolved);
 
   // Make nativescript-hot-loader test .tsx files (not sure how to chain).
   resolved.module.rules[2].test = /\.(js|ts)x?$/;
