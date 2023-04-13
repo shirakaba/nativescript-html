@@ -36,7 +36,6 @@ export abstract class NHTMLElement<N extends View = View> extends HTMLElement {
   public set className(value: string) {
     this.view.className = value;
     console.log(`this.view.className = ${value}`, [...this.view.cssClasses]);
-    this.view._onCssStateChange();
   }
   // TODO: classList, maybe class?
 
@@ -134,6 +133,24 @@ export function patchCreateElement(document: typeof Document): void {
       element.postConstruction();
     }
 
-    return element;
+    return new Proxy(element, {
+      set: (target, p, newValue, receiver) => {
+        // console.log(
+        //   `<${sanitisedName.toLowerCase()}> set '${p.toString()}' = `,
+        //   newValue
+        // );
+
+        if (
+          p.toString().startsWith('__reactProps') &&
+          'className' in newValue
+        ) {
+          Reflect.set(target, 'className', newValue.className, receiver);
+        }
+
+        return Reflect.set(target, p, newValue, receiver);
+      },
+    });
+
+    // return element;
   };
 }
