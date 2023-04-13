@@ -6,10 +6,12 @@
   "dependencies": {
     "@nativescript/core": "^8.5.0",
     "@nativescript/ios": "^8.5.1",
+    "@nativescript/tailwind": "^2.0.1",
     "@nativescript/theme": "~3.0.2",
     "nativescript-html": "file:..",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "tailwindcss": "^3.3.1",
     "url": "^0.11.0"
   },
   "devDependencies": {

@@ -5,3 +5,4 @@ lib
 # It's a pain to lint anything that isn't included by a tsconfig.json
 webpack.config.js
 nativescript.config.ts
+tailwind.config.js
