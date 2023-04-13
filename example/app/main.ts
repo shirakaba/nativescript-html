@@ -7,8 +7,6 @@ import { App } from './App';
 Application.run({
   create: () => {
     const div = document.createElement('div');
-    div.style.display = 'block';
-    div.style.margin = '8px';
 
     // Render your React component instead
     const root = createRoot(div);
