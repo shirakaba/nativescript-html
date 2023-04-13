@@ -7,6 +7,10 @@ import { App } from './App';
 Application.run({
   create: () => {
     const div = document.createElement('div');
+    // Sanity check. This calls through to setter in /src/HTMLWebElement.ts,
+    // which then sets div.view.className = 'bg-red' as we can confirm via
+    // console logs.
+    div.className = 'bg-red';
 
     // Render your React component instead
     const root = createRoot(div);
