@@ -3,21 +3,8 @@ export function App() {
   // styles. May wanna try Preact instead unless there's a webpack option to
   // override it.
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%',
-        height: '100%',
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          backgroundColor: 'rgb(237,112,45)',
-          height: 50,
-        }}
-      >
+    <div className="flex flex-col w-full h-full">
+      <div className="flex h-12 bg-orange">
         <div
           style={{
             color: 'white',

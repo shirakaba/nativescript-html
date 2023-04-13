@@ -30,6 +30,16 @@ export abstract class NHTMLElement<N extends View = View> extends HTMLElement {
       this.dispatchEvent(event);
   }
 
+  public get className(): string {
+    return this.view.className;
+  }
+  public set className(value: string) {
+    this.view.className = value;
+    console.log(`this.view.className = ${value}`, [...this.view.cssClasses]);
+    this.view._onCssStateChange();
+  }
+  // TODO: classList, maybe class?
+
   // happy-dom does implement CSS but it's easiest just to use what NativeScript
   // gives us.
   get style(): CSSStyleDeclaration {
