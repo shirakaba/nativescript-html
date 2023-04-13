@@ -65,7 +65,7 @@ export abstract class HTMLWebElement extends HTMLFlexboxLayoutElement {
 
     // @ts-ignore not actually readonly.
     this.tagName = this.tagName.replace('-', '');
-    this.view.cssClasses.add(this.tagName.toLowerCase());
+    this.view.cssType = this.tagName.toLowerCase();
   }
 
   get style(): CSSStyleDeclaration {
