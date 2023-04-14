@@ -1,12 +1,12 @@
 export function App(stories: { title: string; domain?: string }[]) {
   return (
-    <div className="flex-col w-full h-full justify-start">
-      <div className="h-14 bg-orange-500 shrink-0 items-center justify-between">
-        <div className="text-white font-bold border-2 border-white p-1 h-4 m-4 shrink-0">
+    <div className="h-full w-full flex-col justify-start">
+      <div className="h-14 shrink-0 items-center justify-between bg-orange-500">
+        <div className="m-4 h-4 shrink-0 border-2 border-white p-1 font-bold text-white">
           Y
         </div>
 
-        <div className="flex-col shrink-[2]">
+        <div className="shrink-[2] flex-col">
           <p className="text-base font-bold">Hacker News</p>
           <p className="text-xs leading-none">
             new | threads | past | comments | ask | show | jobs | submit
@@ -15,7 +15,7 @@ export function App(stories: { title: string; domain?: string }[]) {
         <div className="shrink-1">LinguaBrowse (336) | logout</div>
       </div>
 
-      <div className="flex-col grow-1 bg-[#F6F6F0] justify-start w-full">
+      <div className="grow-1 w-full flex-col justify-start bg-[#F6F6F0]">
         {stories.map(({ title, domain }, i) => (
           <Story key={i} rank={i + 1} title={title} domain={domain} />
         ))}
@@ -35,11 +35,11 @@ function Story({
 }) {
   return (
     <div className="items-start p-4">
-      <div className="text-[#828282] mr-1 shrink-0">{rank}. ▲</div>
-      <div className="flex-col justify-start items-stretch">
+      <div className="mr-1 shrink-0 text-[#828282]">{rank}. ▲</div>
+      <div className="flex-col items-stretch justify-start">
         <p className="text-base leading-none">{title}</p>
-        {domain && <p className="text-xs text-[#828282] py-1">({domain})</p>}
-        <p className="text-s text-[#828282] mb-3">
+        {domain && <p className="py-1 text-xs text-[#828282]">({domain})</p>}
+        <p className="text-s mb-3 text-[#828282]">
           123 points by whoever 3 hours ago | flag | hide | 12 comments
         </p>
       </div>
