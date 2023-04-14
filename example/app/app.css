@@ -7,6 +7,10 @@ This is where the vast majority of your CSS code goes. */
 
 /* 1em = 16px */
 
+#root {
+  font-size: 13.33;
+}
+
 h1 {
   font-weight: bold;
   font-size: 32;
@@ -50,17 +54,7 @@ h6 {
 }
 
 p {
-  /* Approximate display: block */
-  width: 100%;
-  flex-direction: row;
   flex-wrap: wrap;
-}
-
-p,
-span,
-a,
-button {
-  font-size: 16;
 }
 
 a {

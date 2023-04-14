@@ -13,6 +13,10 @@ export class NHTMLImageElement
     super();
 
     this.view.addChild(this.image);
+
+    // TODO: consider how to sync up width/height between these two
+    // this.image.style.width = { unit: '%', value: 100 };
+    // this.image.style.height = { unit: '%', value: 100 };
   }
 
   longDesc = '';

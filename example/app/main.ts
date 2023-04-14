@@ -7,6 +7,7 @@ import { App } from './App';
 Application.run({
   create: () => {
     const div = document.createElement('div');
+    div.id = 'root';
 
     // Render your React component instead
     const root = createRoot(div);
