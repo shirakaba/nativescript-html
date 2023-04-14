@@ -11,7 +11,7 @@ Application.run({
 
     // Render your React component instead
     const root = createRoot(div);
-    root.render(App());
+    root.render(App(stories));
 
     return div.view;
   },
@@ -21,3 +21,38 @@ Application.run({
 Do not place any code after the application has been started as it will not
 be executed on iOS.
 */
+
+const stories = [
+  {
+    title: 'Largest island in a lake on an island in a lake on an island',
+    domain: 'elbruz.org',
+  },
+  {
+    title: 'Live ESA launch to Jupiter [video]',
+    domain: 'esa.int',
+  },
+  {
+    title: 'Zig Build System',
+    domain: 'liujiacai.net',
+  },
+  {
+    title: 'Replying to comments about our web page design',
+    domain: 'exoticsilicon.com',
+  },
+  {
+    title:
+      "Ask HN: Side project of more that $2k monthly revenue what's your project?",
+  },
+  {
+    title: 'Temporal quality degradation in AI models',
+    domain: 'nannyml.com',
+  },
+  {
+    title: 'GNU toolchain for RISC-V including GCC',
+    domain: 'github.com/riscv-collab',
+  },
+  {
+    title: 'Building LLM Applications for Production',
+    domain: 'huyenchip.com',
+  },
+];

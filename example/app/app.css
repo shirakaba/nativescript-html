@@ -54,7 +54,16 @@ h6 {
 }
 
 p {
+  width: 100%;
+}
+
+p,
+span {
   flex-wrap: wrap;
+}
+
+label {
+  max-lines: 0;
 }
 
 a {

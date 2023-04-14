@@ -1,14 +1,12 @@
-export function App() {
-  // This isn't working with React because they use some dumb Symbols to set
-  // styles. May wanna try Preact instead unless there's a webpack option to
-  // override it.
+export function App(stories: { title: string; domain?: string }[]) {
   return (
-    <div className="flex flex-col w-full h-full justify-start">
-      <div className="flex h-13 bg-orange-500 shrink-0 items-center justify-between">
+    <div className="flex-col w-full h-full justify-start">
+      <div className="h-14 bg-orange-500 shrink-0 items-center justify-between">
         <div className="text-white font-bold border-2 border-white p-1 h-4 m-4 shrink-0">
           Y
         </div>
-        <div className="flex flex-col shrink-1">
+
+        <div className="flex-col shrink-[2]">
           <p className="text-base font-bold">Hacker News</p>
           <p className="text-xs leading-none">
             new | threads | past | comments | ask | show | jobs | submit
@@ -17,11 +15,11 @@ export function App() {
         <div className="shrink-1">LinguaBrowse (336) | logout</div>
       </div>
 
-      <Story
-        rank={1}
-        title="Largest island in a lake on an island in a lake on an island"
-        domain="elbruz.org"
-      />
+      <div className="flex-col grow-1 bg-[#F6F6F0] justify-start w-full">
+        {stories.map(({ title, domain }, i) => (
+          <Story key={i} rank={i + 1} title={title} domain={domain} />
+        ))}
+      </div>
     </div>
   );
 }
@@ -32,12 +30,19 @@ function Story({
   rank,
 }: {
   title: string;
-  domain: string;
+  domain?: string;
   rank: number;
 }) {
   return (
-    <div className="grow-1 bg-[rgb(246,246,240)]">
-      <p>{title}</p>
+    <div className="items-start p-4">
+      <div className="text-[#828282] mr-1 shrink-0">{rank}. ▲</div>
+      <div className="flex-col justify-start items-stretch">
+        <p className="text-base leading-none">{title}</p>
+        {domain && <p className="text-xs text-[#828282] py-1">({domain})</p>}
+        <p className="text-s text-[#828282] mb-3">
+          123 points by whoever 3 hours ago | flag | hide | 12 comments
+        </p>
+      </div>
     </div>
   );
 }
