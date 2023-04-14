@@ -49,6 +49,13 @@ h6 {
   margin-bottom: 37.33;
 }
 
+p {
+  /* Approximate display: block */
+  width: 100%;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
 p,
 span,
 a,

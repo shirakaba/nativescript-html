@@ -16,7 +16,6 @@ export class NHTMLButtonElement
   constructor() {
     super();
 
-    this.style.display = 'inline-block';
     this.view.addChild(this.button);
   }
 

@@ -12,7 +12,6 @@ export class NHTMLImageElement
   constructor() {
     super();
 
-    this.style.display = 'block';
     this.view.addChild(this.image);
   }
 
