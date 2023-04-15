@@ -12,13 +12,12 @@ export class NText extends window.Text {
     super(data);
 
     this.view.text = data;
-    this.view.minHeight = 'auto';
-    this.view.padding = 0;
-    this.view.margin = 0;
 
     // TODO: implement contenteditable. TextView is editable, but it brings a
     // scrollbar which I don't know how to suppress.
-    this.view.maxLines = 0;
+
+    // max-lines seems to be supported only through inline styles, not CSS.
+    this.view.style.maxLines = 0;
   }
 
   get wholeText(): string {
