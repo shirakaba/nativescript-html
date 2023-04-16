@@ -5,7 +5,7 @@ import { GlobalRegistrator } from '@happy-dom/global-registrator';
 // Register happy-dom classes like Event, EventTarget on the global namespace.
 GlobalRegistrator.register();
 
-import { Button, FlexboxLayout, Image, Label } from '@nativescript/core';
+import { Button, FlexboxLayout, Image, Span } from '@nativescript/core';
 
 import { patch as patchEvents } from './EventTarget';
 import {
@@ -67,6 +67,6 @@ declare global {
     button: Button;
   }
   interface Text {
-    view: Label;
+    span: Span;
   }
 }
