@@ -37,10 +37,15 @@ function Story({
     <div className="items-start p-4">
       <div className="mr-1 shrink-0 text-[#828282]">{rank}. ▲</div>
       <div className="flex-col items-stretch justify-start">
-        <p className="text-base leading-none">{title}</p>
-        {domain && <p className="py-1 text-xs text-[#828282]">({domain})</p>}
-        <p className="text-s mb-3 text-[#828282]">
-          123 points by whoever 3 hours ago | flag | hide | 12 comments
+        <p className="text-base leading-none">
+          {title}
+          {domain && (
+            <span className="py-1 text-xs text-[#828282]"> ({domain})</span>
+          )}
+        </p>
+        <p className="text-s text-[#828282]">
+          123 points by <a>someone</a> <a>3 hours ago</a> | <a>flag</a> |{' '}
+          <a>hide</a> |<a>12 comments</a>
         </p>
       </div>
     </div>
