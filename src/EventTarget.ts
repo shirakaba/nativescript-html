@@ -466,6 +466,8 @@ export function patch(): void {
   // @ts-ignore
   delete Element.prototype.dispatchEvent;
 
+  const legacyNotify = Observable.prototype.notify;
+
   // We patch notify() to re-fire all non-user NativeScript events as DOM
   // Events.
   //
@@ -481,12 +483,12 @@ export function patch(): void {
     const { eventName, ...rest } = data;
     const event = new CustomEvent(eventName, { detail: { ...rest } });
 
-    // Instead of calling handleEvent on all observers (the old methodology), we
-    // dispatch a DOM Event by reaching out to the implicit DOM container. This
-    // effectively moves the responsibility of coordinating the event flow and
-    // event listener handling to the event itself.
-
     if ((this as Dispatcher).dispatchEvent) {
+      // Instead of calling handleEvent on all observers (the old methodology), we
+      // dispatch a DOM Event by reaching out to the implicit DOM container. This
+      // effectively moves the responsibility of coordinating the event flow and
+      // event listener handling to the event itself.
+
       // console.log(
       //   `calling ${this.constructor.name}.dispatchEvent('${eventName}')...`
       // );
@@ -496,8 +498,9 @@ export function patch(): void {
       // console.log(`calling window.dispatchEvent('${eventName}')...`);
       // Either we haven't wrapped the view yet (e.g. the "created" event was
       // fired during the View's constructor) or it's some view that wasn't made
-      // in userland (e.g. the accessibility singleton).
-      window.dispatchEvent(event);
+      // in userland (e.g. the accessibility singleton, or FormattedString's
+      // ObservableArray<Span>).
+      legacyNotify.call(this, data);
     }
   };
 
