@@ -5,7 +5,7 @@
   "private": true,
   "dependencies": {
     "@nativescript/core": "^8.5.0",
-    "@nativescript/ios": "^8.5.1",
+    "@nativescript/ios": "^8.5.2-alpha.3",
     "@nativescript/tailwind": "^2.0.1",
     "nativescript-html": "file:..",
     "react": "^18.2.0",
