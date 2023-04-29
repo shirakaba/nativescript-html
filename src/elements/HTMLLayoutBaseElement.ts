@@ -2,6 +2,7 @@ import {
   FormattedString,
   Label,
   LayoutBase,
+  Span,
   TextBase,
 } from '@nativescript/core';
 
@@ -18,10 +19,150 @@ export abstract class HTMLLayoutBaseElement<
     if (node instanceof NHTMLElement) {
       this.view.addChild(node.view);
     } else if (node instanceof Text) {
-      this.appendText(node);
+      // Any time a Text gets added to the tree, find the closest block and
+      // update the text runs. Currently buggy.
+
+      const closestBlock = this.getClosestBlock();
+      if (!(closestBlock instanceof NHTMLElement)) {
+        // this.parentNode is returning false, so I guess it's adding things
+        // before they're in the tree..?
+        console.log("Not in tree yet, so can't update text");
+        return returnValue;
+      }
+
+      const lastChild = closestBlock.view.getChildAt(
+        closestBlock.view.getChildrenCount() - 1
+      );
+
+      const runs = (
+        closestBlock as HTMLLayoutBaseElement<LayoutBase>
+      ).getUpdatedTextRuns();
+
+      // As we're only appending to the end, rather than reconciling all
+      // children, we can simply reconcile the final child.
+      const lastRun = runs[runs.length - 1];
+
+      if (!(lastRun instanceof FormattedString)) {
+        throw new Error(
+          'Expected addition of Text to yield a FormattedString as the last run'
+        );
+      }
+
+      if (lastChild instanceof TextBase) {
+        console.log('reusing textBase!');
+        // lastChild.formattedText = lastRun;
+        lastChild.setProperty('formattedText', lastRun);
+      } else {
+        console.log('adding textBase');
+        const label = new Label();
+        label.formattedText = lastRun;
+        closestBlock.view.addChild(label);
+      }
     }
 
     return returnValue;
+  }
+
+  private getClosestBlock(): ParentNode | null {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    let node: ParentNode | null = this;
+    while (node) {
+      if (isBlockElement(node)) {
+        return node;
+      }
+      node = node.parentNode;
+    }
+    return null;
+  }
+
+  getUpdatedTextRuns(): Array<FormattedString | HTMLElement> {
+    const runs = new Array<FormattedString | HTMLElement>();
+    const spans = new Array<Span>();
+
+    for (const childNode of this.childNodes) {
+      if (isHTMLElement(childNode)) {
+        if (isBlockElement(childNode)) {
+          console.log('IS BLOCK');
+          // Flush any current spans
+          if (spans.length) {
+            const fs = new FormattedString();
+            fs.spans.push(...spans.splice(0));
+            runs.push(fs);
+          }
+
+          runs.push(childNode);
+          continue;
+        }
+        console.log(`IS INLINE ${childNode.tagName}`);
+
+        // Could be neither block nor inline, but for now just treat as inline
+        spans.push(...this.getTextRun(childNode));
+        continue;
+      }
+
+      if (!(childNode instanceof Text)) {
+        console.log('Was neither HTMLElement nor text', childNode);
+        continue;
+      }
+
+      const span = new Span();
+      span.text = childNode.data;
+      spans.push(span);
+    }
+
+    // Flush any pending spans
+    if (spans.length) {
+      const fs = new FormattedString();
+      fs.spans.push(...spans.splice(0));
+      runs.push(fs);
+    }
+
+    console.log(
+      `runs (${runs.length}) ${JSON.stringify(
+        runs.map((run) =>
+          run instanceof FormattedString
+            ? run.spans.map((span) => span.text)
+            : run.toString()
+        )
+      )}`
+    );
+
+    return runs;
+  }
+
+  private getTextRun(element: HTMLElement): Span[] {
+    const runs = new Array<Span>();
+    for (const childNode of element.childNodes) {
+      if (isHTMLElement(childNode)) {
+        if (isBlockElement(childNode)) {
+          console.log(`[getTextRun] IS BLOCK ${childNode.tagName}`);
+          break;
+        }
+
+        console.log(`[getTextRun] IS INLINE ${childNode.tagName}`);
+        // Could be neither block nor inline, but for now just treat as inline
+
+        runs.push(...this.getTextRun(element));
+        continue;
+      }
+
+      if (!(childNode instanceof Text)) {
+        console.log('Was neither HTMLElement nor text', childNode);
+        continue;
+      }
+
+      const span = new Span();
+      span.text = childNode.data;
+      runs.push(span);
+    }
+
+    console.log(
+      `getTextRun (${runs.length}) ${JSON.stringify(
+        runs.map((run) => run.text)
+      )}`
+    );
+
+    return runs;
   }
 
   private appendText(node: Text): void {
@@ -180,4 +321,48 @@ export abstract class HTMLLayoutBaseElement<
 
   // ChildNode.remove(), ChildNode.replaceWith(), ChildNode.after(), and
   // ChildNode.before() also use existing methods under-the-hood.
+}
+
+const blockElements = new Set([
+  'ADDRESS',
+  'ARTICLE',
+  'ASIDE',
+  'BLOCKQUOTE',
+  'DETAILS',
+  'DIALOG',
+  'DD',
+  'DIV',
+  'DL',
+  'DT',
+  'FIELDSET',
+  'FIGCAPTION',
+  'FIGURE',
+  'FOOTER',
+  'FORM',
+  'H1',
+  'H2',
+  'H3',
+  'H4',
+  'H5',
+  'H6',
+  'HEADER',
+  'HGROUP',
+  'HR',
+  'LI',
+  'MAIN',
+  'NAV',
+  'OL',
+  'P',
+  'PRE',
+  'SECTION',
+  'TABLE',
+  'UL',
+]);
+
+function isBlockElement(node: Node): boolean {
+  return blockElements.has(node.nodeName);
+}
+
+function isHTMLElement(node: Node): node is HTMLElement {
+  return node.nodeType === Node.ELEMENT_NODE;
 }
