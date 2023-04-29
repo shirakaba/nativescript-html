@@ -59,6 +59,10 @@ export class NText extends window.Text {
     this.data = value;
   }
 
+  get data(): string {
+    return super.data;
+  }
+
   set data(data: string) {
     super.data = data;
     this.view.text = data;
