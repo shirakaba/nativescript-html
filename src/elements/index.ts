@@ -20,24 +20,24 @@ declare const global: any;
 
 export function registerAllElements(): void {
   // (This is purely for debug)
-  const on = Observable.prototype.on;
-  Observable.prototype.on = function (
-    eventNames: string,
-    callback: (data: EventData) => void,
-    thisArg?: any
-  ): void {
-    // console.log(`${this.constructor.name}.on('${eventNames}')`);
-    on.call(this, eventNames, callback, thisArg);
-  };
-  const addEventListener = Observable.prototype.addEventListener;
-  Observable.prototype.addEventListener = function (
-    eventNames: string,
-    callback: (data: EventData) => void,
-    thisArg?: any
-  ): void {
-    // console.log(`${this.constructor.name}.addEventListener('${eventNames}')`);
-    addEventListener.call(this, eventNames, callback, thisArg);
-  };
+  // const on = Observable.prototype.on;
+  // Observable.prototype.on = function (
+  //   eventNames: string,
+  //   callback: (data: EventData) => void,
+  //   thisArg?: any
+  // ): void {
+  //   // console.log(`${this.constructor.name}.on('${eventNames}')`);
+  //   on.call(this, eventNames, callback, thisArg);
+  // };
+  // const addEventListener = Observable.prototype.addEventListener;
+  // Observable.prototype.addEventListener = function (
+  //   eventNames: string,
+  //   callback: (data: EventData) => void,
+  //   thisArg?: any
+  // ): void {
+  //   // console.log(`${this.constructor.name}.addEventListener('${eventNames}')`);
+  //   addEventListener.call(this, eventNames, callback, thisArg);
+  // };
 
   HTMLAbsoluteLayoutElement.register('absolute-layout');
   HTMLDockLayoutElement.register('dock-layout');
