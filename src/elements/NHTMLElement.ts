@@ -23,11 +23,15 @@ export abstract class NHTMLElement<N extends View = View> extends HTMLElement {
   // event that's useless in the first place.
   abstract readonly view: N;
 
+  isBlock = false;
+
   postConstruction(): void {
     // Give the view a way to directly call the dispatchEvent() method of its DOM
     // container.
     (this.view as Dispatcher<N>).dispatchEvent = (event: Event) =>
       this.dispatchEvent(event);
+
+    this.isBlock = blockElements.has(this.tagName);
   }
 
   public get id(): string {
@@ -167,3 +171,39 @@ export function patchCreateElement(document: typeof Document): void {
     // return element;
   };
 }
+
+const blockElements = new Set([
+  'ADDRESS',
+  'ARTICLE',
+  'ASIDE',
+  'BLOCKQUOTE',
+  'DETAILS',
+  'DIALOG',
+  'DD',
+  'DIV',
+  'DL',
+  'DT',
+  'FIELDSET',
+  'FIGCAPTION',
+  'FIGURE',
+  'FOOTER',
+  'FORM',
+  'H1',
+  'H2',
+  'H3',
+  'H4',
+  'H5',
+  'H6',
+  'HEADER',
+  'HGROUP',
+  'HR',
+  'LI',
+  'MAIN',
+  'NAV',
+  'OL',
+  'P',
+  'PRE',
+  'SECTION',
+  'TABLE',
+  'UL',
+]);

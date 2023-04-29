@@ -12,6 +12,8 @@ module.exports = (env) => {
   webpack.chainWebpack((config, env) => {
     supportReact(config, env);
 
+    env.watchNodeModules = true;
+
     /**
      * If you wish to use window.Buffer, set this to `true` and run:
      *   npm install --save buffer

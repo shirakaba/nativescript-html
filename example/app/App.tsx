@@ -16,7 +16,7 @@ export function App(stories: { title: string; domain?: string }[]) {
       </div>
 
       <div className="grow-1 w-full flex-col justify-start bg-[#F6F6F0]">
-        {stories.map(({ title, domain }, i) => (
+        {stories.slice(0, 1).map(({ title, domain }, i) => (
           <Story key={i} rank={i + 1} title={title} domain={domain} />
         ))}
       </div>
@@ -34,12 +34,12 @@ function Story({
   rank: number;
 }) {
   return (
-    <div className="items-start p-4">
+    <div className="items-start">
       <div className="mr-1 shrink-0 text-[#828282]">{rank}. ▲</div>
       <div className="flex-col items-stretch justify-start">
         <p className="text-base leading-none">{title}</p>
         {domain && <p className="py-1 text-xs text-[#828282]">({domain})</p>}
-        <p className="text-s mb-3 text-[#828282]">
+        <p className="text-s text-[#828282]">
           123 points by whoever 3 hours ago | flag | hide | 12 comments
         </p>
       </div>

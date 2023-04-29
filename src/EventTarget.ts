@@ -489,13 +489,13 @@ export function patch(): void {
       // effectively moves the responsibility of coordinating the event flow and
       // event listener handling to the event itself.
 
-      // console.log(
-      //   `calling ${this.constructor.name}.dispatchEvent('${eventName}')...`
-      // );
+      console.log(
+        `calling ${this.constructor.name}.dispatchEvent('${eventName}')...`
+      );
       // It's a View that we've wrapped
       (this as Dispatcher).dispatchEvent(event);
     } else {
-      // console.log(`calling window.dispatchEvent('${eventName}')...`);
+      console.log(`calling notify('${eventName}')...`);
       // Either we haven't wrapped the view yet (e.g. the "created" event was
       // fired during the View's constructor) or it's some view that wasn't made
       // in userland (e.g. the accessibility singleton, or FormattedString's
