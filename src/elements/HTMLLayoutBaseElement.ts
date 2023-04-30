@@ -1,7 +1,6 @@
 import { LayoutBase } from '@nativescript/core';
 
 import { NHTMLElement } from './NHTMLElement';
-import { NText } from './Text';
 
 // TODO: check whether this class could actually apply more widely to instances
 // of ContainerView, not just LayoutBase.
@@ -11,7 +10,7 @@ export abstract class HTMLLayoutBaseElement<
   appendChild<T extends Node>(node: T): T {
     const returnValue = super.appendChild(node);
 
-    if (node instanceof NHTMLElement || node instanceof NText) {
+    if (node instanceof NHTMLElement) {
       this.view.addChild(node.view);
     }
 
@@ -21,7 +20,7 @@ export abstract class HTMLLayoutBaseElement<
   removeChild<T extends Node>(child: T): T {
     const returnValue = super.removeChild(child);
 
-    if (child instanceof NHTMLElement || child instanceof NText) {
+    if (child instanceof NHTMLElement) {
       this.view.removeChild(child.view);
     }
 
@@ -29,20 +28,18 @@ export abstract class HTMLLayoutBaseElement<
   }
 
   insertBefore<T extends Node>(newNode: T, referenceNode: Node | null): T {
+    if (!referenceNode) {
+      return this.appendChild(newNode);
+    }
+
     const returnValue = super.insertBefore(newNode, referenceNode);
 
     if (
-      (newNode instanceof NHTMLElement || newNode instanceof NText) &&
-      (referenceNode === null ||
-        referenceNode instanceof NHTMLElement ||
-        referenceNode instanceof NText)
+      newNode instanceof NHTMLElement &&
+      referenceNode instanceof NHTMLElement
     ) {
-      if (referenceNode) {
-        const childIndex = this.view.getChildIndex(referenceNode.view);
-        this.view.insertChild(newNode.view, childIndex);
-      } else {
-        this.view.addChild(newNode.view);
-      }
+      const childIndex = this.view.getChildIndex(referenceNode.view);
+      this.view.insertChild(newNode.view, childIndex);
     }
 
     return returnValue;

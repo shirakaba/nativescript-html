@@ -1,17 +1,18 @@
-import { EventData, Observable } from '@nativescript/core';
-
 import { HTMLAbsoluteLayoutElement } from './HTMLAbsoluteLayoutElement';
 import { NHTMLAnchorElement } from './HTMLAnchorElement';
 import { NHTMLButtonElement } from './HTMLButtonElement';
 import { NHTMLDivElement } from './HTMLDivElement';
 import { HTMLDockLayoutElement } from './HTMLDockLayoutElement';
 import { HTMLFlexboxLayoutElement } from './HTMLFlexboxLayoutElement';
+import { HTMLFormattedStringElement } from './HTMLFormattedStringElement';
 import { HTMLGridLayoutElement } from './HTMLGridLayoutElement';
 import { NHTMLHeadingElement } from './HTMLHeadingElement';
 import { NHTMLImageElement } from './HTMLImageElement';
 import { NHTMLParagraphElement } from './HTMLParagraphElement';
+import { HTMLRunElement } from './HTMLRunElement';
 import { NHTMLSpanElement } from './HTMLSpanElement';
 import { HTMLStackLayoutElement } from './HTMLStackLayoutElement';
+import { HTMLTextElement } from './HTMLTextElement';
 import { HTMLWrapLayoutElement } from './HTMLWrapLayoutElement';
 
 // Core's type declarations for global haven't worked since a change to
@@ -42,9 +43,14 @@ export function registerAllElements(): void {
   HTMLAbsoluteLayoutElement.register('absolute-layout');
   HTMLDockLayoutElement.register('dock-layout');
   HTMLFlexboxLayoutElement.register('flexbox-layout');
+  HTMLFlexboxLayoutElement.register('flex-');
   HTMLGridLayoutElement.register('grid-layout');
   HTMLStackLayoutElement.register('stack-layout');
   HTMLWrapLayoutElement.register('wrap-layout');
+
+  HTMLWrapLayoutElement.register('t-');
+  HTMLWrapLayoutElement.register('run-');
+  HTMLWrapLayoutElement.register('format-');
 
   // Register our fun HTML fill-ins.
   // Remember to update the set of intrinsic elements in
@@ -79,4 +85,7 @@ export {
   HTMLGridLayoutElement,
   HTMLStackLayoutElement,
   HTMLWrapLayoutElement,
+  HTMLFormattedStringElement,
+  HTMLTextElement,
+  HTMLRunElement,
 };

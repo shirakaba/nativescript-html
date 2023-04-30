@@ -1,25 +1,10 @@
-import { Label } from '@nativescript/core';
-
 let patched = false;
 
 declare const window: { Text: typeof Text };
 
+// TODO: no longer has a view, so can deprecate this. But the implementation of
+// wholeText is still valuable..
 export class NText extends window.Text {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  readonly view = new (require('@nativescript/core').Label as typeof Label)();
-
-  constructor(data: string) {
-    super(data);
-
-    this.view.text = data;
-
-    // TODO: implement contenteditable. TextView is editable, but it brings a
-    // scrollbar which I don't know how to suppress.
-
-    // max-lines seems to be supported only through inline styles, not CSS.
-    this.view.style.maxLines = 0;
-  }
-
   get wholeText(): string {
     let wholeText = '';
 
@@ -57,15 +42,6 @@ export class NText extends window.Text {
 
     toRemove.forEach((text) => text.remove());
     this.data = value;
-  }
-
-  get data(): string {
-    return super.data;
-  }
-
-  set data(data: string) {
-    super.data = data;
-    this.view.text = data;
   }
 }
 

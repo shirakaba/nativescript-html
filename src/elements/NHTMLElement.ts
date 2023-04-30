@@ -1,4 +1,4 @@
-import { View } from '@nativescript/core';
+import { ViewBase } from '@nativescript/core';
 
 import { Dispatcher } from '../EventTarget';
 
@@ -7,7 +7,9 @@ import { Dispatcher } from '../EventTarget';
  * Implicitly extends from our NEventTarget implementation (which we use instead
  * of happy-dom's EventTarget).
  */
-export abstract class NHTMLElement<N extends View = View> extends HTMLElement {
+export abstract class NHTMLElement<
+  N extends ViewBase = ViewBase
+> extends HTMLElement {
   static register(name: string, options?: ElementDefinitionOptions): void {
     customElements.define(
       name,
@@ -93,7 +95,8 @@ export abstract class NHTMLElement<N extends View = View> extends HTMLElement {
   // The Element methods for attribute-setting will be relatively constant.
 }
 
-// User agent HTMLElements we'll shim in ourselves.
+// User agent HTMLElements we'll shim in ourselves, or custom elements that we
+// don't want to be hyphenated.
 const intrinsicElements = new Set([
   'DIV',
   'P',
@@ -107,6 +110,10 @@ const intrinsicElements = new Set([
   'H5',
   'H6',
   'A',
+  'RUN',
+  'TEXT',
+  'FORMAT',
+  'FLEX',
 ]);
 
 let patched = false;

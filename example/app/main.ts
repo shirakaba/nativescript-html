@@ -2,6 +2,13 @@ import { Application } from '@nativescript/core';
 import 'nativescript-html';
 import { createRoot } from 'react-dom/client';
 
+import {
+  HTMLFlexboxLayoutElement,
+  HTMLFormattedStringElement,
+  HTMLRunElement,
+  HTMLTextElement,
+} from '../../dist/elements';
+
 import { App } from './App';
 
 Application.run({
@@ -56,3 +63,27 @@ const stories = [
     domain: 'huyenchip.com',
   },
 ];
+
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace JSX {
+    interface IntrinsicElements {
+      flex: React.DetailedHTMLProps<
+        React.HTMLAttributes<HTMLFlexboxLayoutElement>,
+        HTMLElement
+      >;
+      format: React.DetailedHTMLProps<
+        React.HTMLAttributes<HTMLFormattedStringElement>,
+        HTMLElement
+      >;
+      run: React.DetailedHTMLProps<
+        React.HTMLAttributes<HTMLRunElement>,
+        HTMLElement
+      >;
+      t: React.DetailedHTMLProps<
+        React.HTMLAttributes<HTMLTextElement>,
+        HTMLElement
+      >;
+    }
+  }
+}
