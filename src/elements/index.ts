@@ -8,11 +8,11 @@ import { HTMLFormattedStringElement } from './HTMLFormattedStringElement';
 import { HTMLGridLayoutElement } from './HTMLGridLayoutElement';
 import { NHTMLHeadingElement } from './HTMLHeadingElement';
 import { NHTMLImageElement } from './HTMLImageElement';
+import { HTMLNLabelElement } from './HTMLNLabelElement';
+import { HTMLNSpanElement } from './HTMLNSpanElement';
 import { NHTMLParagraphElement } from './HTMLParagraphElement';
-import { HTMLRunElement } from './HTMLRunElement';
 import { NHTMLSpanElement } from './HTMLSpanElement';
 import { HTMLStackLayoutElement } from './HTMLStackLayoutElement';
-import { HTMLTextElement } from './HTMLTextElement';
 import { HTMLWrapLayoutElement } from './HTMLWrapLayoutElement';
 
 // Core's type declarations for global haven't worked since a change to
@@ -43,14 +43,14 @@ export function registerAllElements(): void {
   HTMLAbsoluteLayoutElement.register('absolute-layout');
   HTMLDockLayoutElement.register('dock-layout');
   HTMLFlexboxLayoutElement.register('flexbox-layout');
-  HTMLFlexboxLayoutElement.register('flex-');
+  HTMLFlexboxLayoutElement.register('n-flex'); // Alternative name
   HTMLGridLayoutElement.register('grid-layout');
   HTMLStackLayoutElement.register('stack-layout');
   HTMLWrapLayoutElement.register('wrap-layout');
 
-  HTMLWrapLayoutElement.register('t-');
-  HTMLWrapLayoutElement.register('run-');
-  HTMLWrapLayoutElement.register('format-');
+  HTMLFormattedStringElement.register('n-format');
+  HTMLNSpanElement.register('n-span');
+  HTMLNLabelElement.register('n-label');
 
   // Register our fun HTML fill-ins.
   // Remember to update the set of intrinsic elements in
@@ -86,6 +86,6 @@ export {
   HTMLStackLayoutElement,
   HTMLWrapLayoutElement,
   HTMLFormattedStringElement,
-  HTMLTextElement,
-  HTMLRunElement,
+  HTMLNLabelElement,
+  HTMLNSpanElement,
 };

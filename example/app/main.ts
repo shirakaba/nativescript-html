@@ -1,13 +1,12 @@
 import { Application } from '@nativescript/core';
 import 'nativescript-html';
-import { createRoot } from 'react-dom/client';
-
-import {
+import type {
   HTMLFlexboxLayoutElement,
   HTMLFormattedStringElement,
-  HTMLRunElement,
-  HTMLTextElement,
-} from '../../dist/elements';
+  HTMLNLabelElement,
+  HTMLNSpanElement,
+} from 'nativescript-html/dist/elements';
+import { createRoot } from 'react-dom/client';
 
 import { App } from './App';
 
@@ -68,20 +67,20 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace JSX {
     interface IntrinsicElements {
-      flex: React.DetailedHTMLProps<
+      'n-flex': React.DetailedHTMLProps<
         React.HTMLAttributes<HTMLFlexboxLayoutElement>,
         HTMLElement
       >;
-      format: React.DetailedHTMLProps<
+      'n-format': React.DetailedHTMLProps<
         React.HTMLAttributes<HTMLFormattedStringElement>,
         HTMLElement
       >;
-      run: React.DetailedHTMLProps<
-        React.HTMLAttributes<HTMLRunElement>,
+      'n-span': React.DetailedHTMLProps<
+        React.HTMLAttributes<HTMLNSpanElement>,
         HTMLElement
       >;
-      t: React.DetailedHTMLProps<
-        React.HTMLAttributes<HTMLTextElement>,
+      'n-label': React.DetailedHTMLProps<
+        React.HTMLAttributes<HTMLNLabelElement>,
         HTMLElement
       >;
     }

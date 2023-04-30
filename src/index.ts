@@ -17,8 +17,8 @@ import {
   HTMLStackLayoutElement,
   HTMLWrapLayoutElement,
   HTMLFormattedStringElement,
-  HTMLTextElement,
-  HTMLRunElement,
+  HTMLNLabelElement,
+  HTMLNSpanElement,
 } from './elements';
 import { patchCreateElement } from './elements/NHTMLElement';
 import { patch as patchText } from './elements/Text';
@@ -47,10 +47,10 @@ declare global {
     'grid-layout': HTMLGridLayoutElement;
     'stack-layout': HTMLStackLayoutElement;
     'wrap-layout': HTMLWrapLayoutElement;
-    flex: HTMLFlexboxLayoutElement;
-    format: HTMLFormattedStringElement;
-    run: HTMLRunElement;
-    t: HTMLTextElement;
+    'n-flex': HTMLFlexboxLayoutElement;
+    'n-format': HTMLFormattedStringElement;
+    'n-span': HTMLNSpanElement;
+    'n-label': HTMLNLabelElement;
   }
 
   interface HTMLDivElement {

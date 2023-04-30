@@ -1,6 +1,6 @@
 import { FormattedString, Span } from '@nativescript/core';
 
-import { HTMLRunElement } from './HTMLRunElement';
+import { HTMLNSpanElement } from './HTMLNSpanElement';
 import { NHTMLElement } from './NHTMLElement';
 
 export abstract class HTMLFormattedStringElement<
@@ -15,7 +15,7 @@ export abstract class HTMLFormattedStringElement<
   appendChild<T extends Node>(node: T): T {
     const returnValue = super.appendChild(node);
 
-    if (node instanceof HTMLRunElement) {
+    if (node instanceof HTMLNSpanElement) {
       this.view.spans.push(node.view);
     } else if (node instanceof Text) {
       const span = new Span();
@@ -30,7 +30,7 @@ export abstract class HTMLFormattedStringElement<
   removeChild<T extends Node>(child: T): T {
     const returnValue = super.removeChild(child);
 
-    if (child instanceof HTMLRunElement) {
+    if (child instanceof HTMLNSpanElement) {
       const index = this.view.spans.indexOf(child.view);
       if (index !== -1) {
         this.view.spans.splice(index, 1);
@@ -55,7 +55,7 @@ export abstract class HTMLFormattedStringElement<
     const returnValue = super.insertBefore(newNode, referenceNode);
 
     let referenceIndex = -1;
-    if (referenceNode instanceof HTMLRunElement) {
+    if (referenceNode instanceof HTMLNSpanElement) {
       referenceIndex = this.view.spans.indexOf(referenceNode.view);
     } else if (referenceNode instanceof Text) {
       const span = this.textsToSpans.get(referenceNode);
@@ -67,7 +67,7 @@ export abstract class HTMLFormattedStringElement<
     }
 
     let span: Span;
-    if (newNode instanceof HTMLRunElement) {
+    if (newNode instanceof HTMLNSpanElement) {
       span = newNode.view;
     } else if (newNode instanceof Text) {
       span = new Span();

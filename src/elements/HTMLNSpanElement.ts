@@ -3,7 +3,7 @@ import { Span } from '@nativescript/core';
 import { NHTMLElement } from './NHTMLElement';
 
 // Can't use the name 'span' as it conflicts with HTML
-export abstract class HTMLRunElement<
+export abstract class HTMLNSpanElement<
   N extends Span = Span
 > extends NHTMLElement<N> {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
