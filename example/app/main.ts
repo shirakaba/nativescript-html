@@ -12,7 +12,7 @@ import { App } from './App';
 
 Application.run({
   create: () => {
-    const div = document.createElement('div');
+    const div = document.createElement('n-flex');
     div.id = 'root';
 
     // Render your React component instead

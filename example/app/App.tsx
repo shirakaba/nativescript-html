@@ -41,11 +41,17 @@ function Story({
         <n-label>{rank}. ▲</n-label>
       </n-flex>
       <n-flex className="flex-col items-stretch justify-start">
-        <n-label className="text-base leading-none">{title}</n-label>
-        {domain && (
-          <n-label className="py-1 text-xs text-[#828282]">({domain})</n-label>
-        )}
-        <n-label className="text-s mb-3 text-[#828282]">
+        <n-label className="text-base leading-none">
+          <n-format>
+            <n-span>{title}</n-span>
+            {domain && (
+              <n-span className="py-1 text-xs text-[#828282]">
+                {` (${domain})`}
+              </n-span>
+            )}
+          </n-format>
+        </n-label>
+        <n-label className="text-s text-[#828282]">
           123 points by whoever 3 hours ago | flag | hide | 12 comments
         </n-label>
       </n-flex>
