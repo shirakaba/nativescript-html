@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "@nativescript/core": "^8.5.0",
+    "@nativescript/android": "^8.5.0-beta.2",
+    "@nativescript/core": "^8.5.2",
     "@nativescript/ios": "^8.5.2-alpha.3",
     "@nativescript/tailwind": "^2.0.1",
     "nativescript-html": "file:..",
@@ -14,7 +15,6 @@
     "url": "^0.11.0"
   },
   "devDependencies": {
-    "@nativescript/android": "^8.5.0",
     "@nativescript/types": "^8.5.0",
     "@nativescript/webpack": "~5.0.6",
     "@types/react": "^18.0.35",
